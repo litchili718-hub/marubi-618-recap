@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1500, initial-scale=1">
+<title>丸美 2026 618 人群复盘 · P0-P4 完整报告</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<style>
+/* ===== 公共 Reset ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f4fa;color:#1e293b;min-height:100vh;font-size:13px;padding-top:60px}
+
+/* ===== 全局导航 ===== */
+.global-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:2px solid #e2e8f0;padding:0 24px;display:flex;align-items:center;gap:4px;height:54px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow-x:auto;white-space:nowrap}
+.global-nav .nav-brand{font-size:14px;font-weight:800;color:#1a73e8;margin-right:16px;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.global-nav .nav-brand .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#0d47a1)}
+.global-nav a{display:inline-flex;align-items:center;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#64748b;text-decoration:none;flex-shrink:0;transition:all .15s;border:1.5px solid transparent}
+.global-nav a:hover,.global-nav a.active{background:#eff6ff;color:#1a73e8;border-color:#bfdbfe}
+.global-nav a.shop-link{font-size:10px;padding:4px 9px;white-space:nowrap;letter-spacing:-.2px}
+.global-nav a.p4-link{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#b45309;border:1.5px solid #fbbf24;font-weight:700}
+.global-nav a.p4-link:hover{background:linear-gradient(135deg,#fde68a,#fcd34d)}
+
+/* ===== Section 分隔 ===== */
+.page-section{padding:0 0 40px}
+.section-divider{max-width:1400px;margin:0 auto;padding:8px 24px}
+.section-divider .div-line{border-top:2px dashed #cbd5e1}
+
+/* ===== Index 主页样式 ===== */
+html,
+.app{max-width:1500px;margin:0 auto;padding:32px 24px}
+.topbar{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;padding:24px 32px;border-radius:16px;margin-bottom:24px;box-shadow:0 8px 24px rgba(26,76,217,.25);display:flex;align-items:center;justify-content:space-between}
+.brand .crumb{font-size:12px;opacity:.75;margin-bottom:4px}
+.brand h1{font-size:24px;font-weight:800;letter-spacing:1px}
+.brand .sub{font-size:13px;opacity:.9;margin-top:4px}
+.top-actions{display:flex;gap:8px}
+.btn{background:rgba(255,255,255,.18);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;text-decoration:none;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,.2)}
+.btn:hover{background:rgba(255,255,255,.28)}
+.btn.primary{background:#fff;color:#1a4cd9;font-weight:600}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.kpi{background:#fff;border-radius:12px;padding:24px;border-top:4px solid #10b981;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.kpi.k1{border-top-color:#10b981}
+.kpi.k2{border-top-color:#ef4444}
+.kpi.k3{border-top-color:#6366f1}
+.kpi.k4{border-top-color:#f59e0b}
+.kpi .label{font-size:12px;color:#5d6f93;margin-bottom:8px;font-weight:500}
+.kpi .v{font-size:30px;font-weight:800;color:#1a2540;letter-spacing:-.5px;line-height:1.1;margin-bottom:4px}
+.kpi .sub{font-size:11px;color:#8da0c4}
+.section-title{font-size:18px;font-weight:700;color:#1a2540;margin:32px 0 16px;display:flex;align-items:center;gap:10px}
+.section-title::before{content:"";width:4px;height:18px;background:linear-gradient(180deg,#1a73e8,#0d47a1);border-radius:2px}
+.shop-grid{display:grid;grid-template-columns:repeat(2,1fr);max-width:800px;margin-left:auto;margin-right:auto;gap:16px;margin-bottom:4px}
+.shop-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);cursor:pointer;transition:all .2s;text-decoration:none;color:#1a2540;display:block;border:2px solid transparent}
+.shop-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(26,76,217,.15);border-color:#1a73e8}
+.shop-card .num{font-size:11px;color:#8da0c4;letter-spacing:1px;font-weight:600}
+.shop-card .name{font-size:14px;font-weight:700;margin:6px 0 12px;color:#1a2540;line-height:1.4}
+.shop-card .status{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;margin-bottom:12px}
+.status.green{background:#d1fae5;color:#065f46}
+.status.yellow{background:#fef3c7;color:#92400e}
+.status.red{background:#fee2e2;color:#991b1b}
+.shop-card .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;margin-bottom:12px}
+.shop-card .kp{background:#f7f8fc;padding:6px 8px;border-radius:6px}
+.shop-card .kp .l{color:#8da0c4;font-size:10px}
+.shop-card .kp .v{color:#1a2540;font-weight:700;font-size:13px;margin-top:1px}
+.shop-card .kp.up .v{color:#10b981}
+.shop-card .kp.down .v{color:#ef4444}
+.shop-card .action{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #eef2f7;font-size:11px;color:#1a4cd9;font-weight:600}
+.alert{background:#fff7ed;border-left:4px solid #f59e0b;padding:16px 20px;border-radius:8px;margin-bottom:24px;font-size:13px;line-height:1.7;color:#7c4a03}
+.alert b{color:#b45309}
+.cross-link{background:linear-gradient(135deg,#eef4ff,#dbeafe);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+.cross-link .txt h3{font-size:15px;color:#1a4cd9;margin-bottom:4px}
+.cross-link .txt p{font-size:12px;color:#5d6f93}
+.cross-link a{background:#1a4cd9;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600}
+.footer{text-align:center;padding:24px;color:#8da0c4;font-size:11px;margin-top:20px}
+
+/* ===== 店铺详情页样式（公共） ===== */
+.shop-topbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e2e8f0;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.shop-topbar .back-link{color:#1a73e8;text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.shop-topbar .back-link:hover{text-decoration:underline}
+.shop-topbar .shop-name{font-size:14px;font-weight:700;color:#0f172a}
+.shop-topbar .anchor-nav{display:flex;gap:14px;font-size:12px}
+.shop-topbar .anchor-nav a{color:#64748b;text-decoration:none;padding:4px 10px;border-radius:6px}
+.shop-topbar .anchor-nav a:hover{background:#f1f5f9;color:#1a73e8}
+
+.page-block{max-width:1400px;margin:24px auto;padding:0 24px}
+.hd{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;padding:16px 28px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.hd strong{font-size:17px;font-weight:700}
+.hd-sub{font-size:11px;opacity:.82;text-align:right;max-width:60%}
+
+/* ===== P1 ===== */
+.p1-block .bd{padding:0}
+.w-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.w-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;position:relative}
+.w-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:10px 10px 0 0}
+.w-before::before{background:#6366f1} .w-during::before{background:#ef4444} .w-after::before{background:#10b981}
+.w-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500}
+.tag-pre{background:#ede9fe;color:#6d28d9} .tag-during{background:#fee2e2;color:#dc2626} .tag-post{background:#dcfce7;color:#16a34a}
+.w-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.w-item{text-align:center;padding:9px 4px;border-radius:6px;background:#fafbfc}
+.w-label{font-size:11px;color:#6b7280;line-height:1.3;font-weight:500}
+.sub{font-size:9px;color:#9ca3af;font-weight:400;display:block}
+.w-gap{font-size:15.5px;font-weight:800;line-height:1.2;margin-top:5px}
+.w-snap{font-size:9.5px;color:#9ca3af;margin-top:2px}
+
+.r-switch{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.r-btn{display:flex;align-items:center;justify-content:center;padding:7px 14px;border:2px solid;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;background:#fff;min-width:76px;transition:.15s;color:var(--bc)}
+.r-btn:hover{background:#f8f8ff}
+.r-btn.active{background:#f0f0ff;box-shadow:0 0 0 2px var(--bc)}
+
+.chart-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;height:560px;display:flex;flex-direction:column;overflow:visible}
+.chart-title{font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;flex-shrink:0}
+.chart-body{flex:1;position:relative;width:100%;min-height:0;overflow:visible}
+
+.tooltip{position:fixed;pointer-events:none;z-index:9999;display:none;background:#fff;color:#1e293b;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.15),0 2px 8px rgba(0,0,0,.08);border:1px solid #e2e8f0;line-height:1.7}
+.tooltip::after{content:'';position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:#fff}
+.t-date{font-size:11px;color:#94a3b8;font-weight:500;display:block;margin-bottom:2px}
+.t-val{font-size:16px;color:#1a73e8;font-weight:700}
+.t-rk{font-size:10px;color:#64748b;font-weight:500;display:block;margin-top:2px}
+.pt-dot{transition:r .15s ease,stroke-width .15s ease}
+
+/* ===== P2 ===== */
+.store-section{background:#fff;border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #e8edf5}
+.sec-title{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';display:inline-block;width:3px;height:15px;background:#1a73e8;border-radius:2px}
+
+.win-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.wcard{background:#fff;border-radius:12px;padding:18px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #e8edf5}
+.wcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.wcard.pre::before{background:linear-gradient(90deg,#94a3b8,#64748b)}
+.wcard.during::before{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.wcard.post::before{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.wlabel{font-size:11px;color:#64748b;font-weight:600;letter-spacing:.3px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wlabel .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.big-num{font-size:26px;font-weight:800;color:#1e293b;font-variant-numeric:tabular-nums;margin:4px 0;letter-spacing:-.5px}
+.big-num .unit{font-size:12px;font-weight:500;color:#94a3b8;margin-left:2px}
+.uv-line{margin-top:4px;font-size:11.5px;color:#64748b}
+
+.trend-wrap{position:relative;width:100%;margin-top:10px}
+.trend-legend{display:flex;justify-content:center;gap:22px;margin-bottom:6px}
+.trend-legend span{display:flex;align-items:center;gap:6px;font-size:12px;color:#475569;font-weight:600}
+.trend-legend i{width:16px;height:4px;border-radius:2px;display:inline-block}
+
+.bar-section{background:#fff;border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #e8edf5}
+.bar-title{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.bar-title::before{content:'';display:inline-block;width:3px;height:15px;background:#7c3aed;border-radius:2px}
+.bar-chart{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:center}
+.bar-label{font-size:11.5px;color:#64748b;text-align:right;font-weight:600}
+.bar-track{height:26px;border-radius:13px;background:#f1f5f9;display:flex;overflow:hidden;align-items:center}
+.bar-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:#fff;min-width:0}
+.bar-val{font-size:11.5px;color:#475569;font-weight:600;text-align:right}
+
+.ch-section{background:#fff;border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #e8edf5}
+.ch-title{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch-title::before{content:'';display:inline-block;width:3px;height:15px;background:#ef4444;border-radius:2px}
+
+.r-tabs{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+.r-tab{padding:6px 20px;border-radius:18px;border:2px solid #e2e8f0;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#64748b}
+.r-tab:hover{border-color:#93c5fd;color:#1e40af}
+.r-tab.active{border-color:#3b82f6;color:#fff;background:#3b82f6}
+.r-tab[data-r="2"].active{border-color:#06b6d4;background:#06b6d4}
+.r-tab[data-r="3"].active{border-color:#8b5cf6;background:#8b5cf6}
+.r-tab[data-r="4"].active{border-color:#f59e0b;background:#f59e0b}
+.r-tab[data-r="5"].active{border-color:#ef4444;background:#ef4444}
+
+.ch-panel{display:none;animation:fadeIn .25s ease}
+.ch-panel.active{display:block}
+.bars-area{display:flex;flex-direction:column;gap:12px;padding:4px 0 8px}
+.win-row{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:center}
+.win-label{font-size:11.5px;color:#64748b;text-align:right;font-weight:600}
+.stack-bar{display:flex;border-radius:13px;overflow:hidden;height:26px;width:100%;position:relative}
+.seg{height:100%;display:flex;align-items:center;justify-content:center;min-width:0}
+.seg-label{font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.35);white-space:nowrap}
+
+.legend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:2px 0 0;margin-top:-4px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:9.5px;color:#475569;padding:3px 7px;border-radius:6px;background:#f8fafc}
+.dot{width:9px;height:9px;border-radius:3px;flex-shrink:0;background:var(--dot-color)}
+.l-name{font-weight:600}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.prod-section{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07);border:1px solid #e8edf5;margin-bottom:18px}
+.tbl-wrap{overflow-x:auto}
+.prod-section table,.spu-section table{width:100%;border-collapse:collapse;font-size:11px}
+.prod-section th{background:#f8fafc;color:#64748b;font-weight:600;padding:10px 7px;border-bottom:2px solid #e2e8f0;white-space:nowrap;font-size:10px;text-align:center}
+.prod-section td{padding:8px 7px;border-bottom:1px solid #f1f5f9;text-align:center;vertical-align:middle}
+.prod-section tr:hover td{background:#eff6ff}
+.rk{display:inline-flex;width:20px;height:20px;justify-content:center;align-items:center;border-radius:5px;font-size:10px;font-weight:700;color:#fff}
+.rk1{background:#ef4444}.rk2{background:#f97316}.rk3{background:#eab308}.rk-other{background:#3b82f6}
+.pname{text-align:left!important;font-weight:600;font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flow-c{font-weight:600;font-variant-numeric:tabular-nums;color:#0f172a}
+.wcol-pre{background:rgba(148,163,184,.04)}.wcol-during{background:rgba(245,158,11,.05)}.wcol-post{background:rgba(34,197,94,.04)}
+.sub-th{font-size:8.5px;color:#94a3b8;font-weight:500;letter-spacing:.3px}
+
+.footer{max-width:1400px;margin:16px auto 32px;padding:0 24px;font-size:10px;color:#94a3b8;text-align:center}
+
+/* ===== P4 人群画像样式 ===== */
+html,
+.app{max-width:1600px;margin:0 auto;padding:24px 20px}
+
+.header{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;padding:20px 28px;border-radius:14px;margin-bottom:20px;box-shadow:0 6px 20px rgba(26,76,217,.22);display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:19px;font-weight:800;letter-spacing:1px;margin-top:4px}
+.header .crumb{font-size:12px;opacity:.85}
+.header .sub{font-size:11px;opacity:.75;margin-top:4px;max-width:700px}
+.header .h-right{display:flex;gap:8px}
+.header .btn{background:rgba(255,255,255,.18);color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;text-decoration:none;font-weight:500;border:1px solid rgba(255,255,255,.2);transition:background .2s}
+.header .btn:hover{background:rgba(255,255,255,.28)}
+.header .btn.primary{background:#fff;color:#1a4cd9;font-weight:600}
+
+.badge-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.badge{background:#fff;border-radius:12px;padding:16px 16px 12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.badge .bl{font-size:11px;color:#8da0c4;font-weight:600;letter-spacing:.5px}
+.badge .bn{font-size:13px;font-weight:700;color:#1a2540;margin:5px 0 8px}
+.badge .bv{display:flex;align-items:center;gap:8px}
+.badge .pct{font-size:18px;font-weight:800;color:#1a2540}
+.badge .tgi{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+
+.tabs{display:flex;gap:0;margin-bottom:0;background:#fff;border-radius:12px 12px 0 0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.tab-btn{padding:12px 28px;font-size:14px;font-weight:600;border:none;background:#f8fafd;color:#5d6f93;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:inherit}
+.tab-btn:hover{background:#eef4ff;color:#1a4cd9}
+.tab-btn.active{background:#fff;color:#1a4cd9;border-bottom-color:#1a4cd9}
+.tab-content{display:none;background:#fff;border-radius:0 0 12px 12px;padding:20px 20px 12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:20px}
+.tab-content.active{display:block}
+
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:4px}
+.chart-card{background:#f8fafd;border-radius:10px;padding:14px 16px 8px;border:1px solid #eef2f7}
+.chart-card h4{font-size:13px;font-weight:700;color:#1a2540;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chart-card h4 .chip{font-size:10px;padding:1px 6px;border-radius:8px;font-weight:600}
+.chart-card h4 .chip.r13{background:#e0f2fe;color:#0369a1}
+.chart-card h4 .chip.r45{background:#fce7f3;color:#be185d}
+.chart-card .canvas-wrap{position:relative;width:100%;height:220px}
+.chart-card.scrollable .canvas-wrap{overflow-x:auto;height:auto}
+.chart-card.scrollable .canvas-wrap canvas{min-width:600px;height:340px!important}
+.chart-card .canvas-wrap canvas{width:100%!important;height:100%!important}
+
+.section-header{font-size:18px;font-weight:800;color:#1a2540;margin:28px 0 14px;padding:12px 16px;background:linear-gradient(135deg,#eef4ff,#dfe9ff);border-radius:12px;display:flex;align-items:center;gap:8px}
+.section-header::before{content:"";width:4px;height:22px;background:linear-gradient(180deg,#1a73e8,#0d47a1);border-radius:3px}
+
+.footer{text-align:center;padding:20px;color:#8da0c4;font-size:11px;margin-top:8px}
+
+@media(max-width:1200px){.chart-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══════ 全局导航 ═══════ -->
+<nav class="global-nav" id="globalNav">
+  <span class="nav-brand"><span class="dot"></span>丸美 · 618 大促复盘</span>
+  <a href="#home" class="active">🏠 总览</a>
+  <a href="#shop1" class="shop-link">MARUBI 丸美</a>
+  <a href="#shop2" class="shop-link">MARUBI 丸美科技抗衰护肤店</a>
+  <a href="#p4" class="p4-link">👥 人群画像</a>
+</nav>
+
+<!-- ═══════ 首页 = P0 总览 ═══════ -->
+<div id="home" class="page-section" style="padding-bottom:8px">
+  <div class="app">
+<div class="topbar">
+<div class="brand">
+<div class="crumb">腾讯经营策略中心</div>
+<h1>丸美 2026 618 人群复盘</h1>
+<div class="sub">大促期 5/15-6/18 · 数据范围 4/10-7/11（前后 5+5 天）</div>
+</div>
+<div class="top-actions"></div>
+</div>
+<!-- 4 张核心数字卡 -->
+<div class="kpi-row">
+<div class="kpi k1">
+<div class="label">5R 资产总净增（2 店合计）</div>
+<div class="v" style="color:#10b981">+383.4万</div>
+<div class="sub">大促期累计 · 2 店合并</div>
+</div>
+<div class="kpi k2">
+<div class="label">R5 信赖人群新增</div>
+<div class="v" style="color:#ef4444">+1,026</div>
+<div class="sub">主店 +985 · 抗衰店 +41（2 店合计 +1,026）</div>
+</div>
+<div class="kpi k3">
+<div class="label">R5 视频号渠道（2 店均值）</div>
+<div class="v" style="color:#6366f1">51.79%</div>
+<div class="sub">视频号持续 TOP1 触点</div>
+</div>
+<div class="kpi k4">
+<div class="label">2 店 5R净增极差</div>
+<div class="v" style="color:#f59e0b">291.7万</div>
+<div class="sub">主店 +337.5万 · 抗衰店 +45.9万</div>
+</div>
+</div>
+<!-- P4 群画像入口 -->
+<div class="cross-link" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:4px solid #f59e0b">
+<div class="txt">
+<h3>👥 2 店聚合人群画像三窗对比</h3>
+<p>人群画像:基础画像 + 十二人设 TGI 排名</p>
+</div>
+<a href="#p4" style="background:#f59e0b">→ 进入人群画像</a>
+</div>
+<div class="section-title">🏪 丸美 2 个企业店 · 点击进入各店详情</div>
+<!-- 2 店卡片墙 -->
+<div class="shop-grid">
+<a class="shop-card" href="#shop1">
+<div class="num">SHOP · 01</div>
+<div class="name">MARUBI 丸美</div>
+<div class="status gray">🟢 主战</div>
+<div class="kpis"><div class="kp"><div class="l">5R 净增</div><div class="v">+337.5万</div></div><div class="kp"><div class="l">R5 新增</div><div class="v">+985</div></div><div class="kp"><div class="l">视频号占比</div><div class="v">60.30%</div></div><div class="kp"><div class="l">朋友圈占比</div><div class="v">19.55%</div></div></div><div class="action">查看 3 页详情 <span>→</span></div>
+</a>
+<a class="shop-card" href="#shop2">
+<div class="num">SHOP · 02</div>
+<div class="name">MARUBI 丸美科技抗衰护肤店</div>
+<div class="status gray">🟢 已运营</div>
+<div class="kpis"><div class="kp"><div class="l">5R 净增</div><div class="v">+45.9万</div></div><div class="kp"><div class="l">R5 新增</div><div class="v">+41</div></div><div class="kp"><div class="l">视频号占比</div><div class="v">43.29%</div></div><div class="kp"><div class="l">朋友圈占比</div><div class="v">3.99%</div></div></div><div class="action">查看 3 页详情 <span>→</span></div>
+</a>
+</div>
+</div>
+</div>
+
+<!-- ═══════ 2 店 P1-P2 ═══════ -->
+
+<!-- ═══════ SHOP 1 · MARUBI 丸美 ═══════ -->
+<div class="section-divider"><div class="div-line"></div></div>
+<div id="shop1" class="page-section">
+  <div class="shop-topbar">
+
+<div class="shop-name">🏪 MARUBI 丸美</div>
+<div class="anchor-nav">
+<a href="#p1">5R 资产</a>
+<a href="#p2">商品流转</a>
+
+
+</div>
+</div><a id="p1"></a><section class="page-block p1-block">
+<div class="hd">
+<span>📊 <strong>MARUBI 丸美 · 小店5R资产总览</strong></span>
+<span class="hd-sub">数值=时间窗内净变化(GAP)；大促前 4/10-5/14 / 大促期 5/15-6/18 / 大促后 6/19-7/11</span>
+</div>
+<div class="bd">
+<div class="w-row"><div class="w-card w-before tag-pre"><div class="w-title">大促前 <span class="tag">4/10–5/14</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#DC2626">-50,737</div><div class="w-snap">结束日 651,599</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#DC2626">-2,979</div><div class="w-snap">结束日 439,396</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#DC2626">-37,327</div><div class="w-snap">结束日 180,148</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#DC2626">-11,265</div><div class="w-snap">结束日 23,567</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+764</div><div class="w-snap">结束日 7,849</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+70</div><div class="w-snap">结束日 639</div></div></div></div><div class="w-card w-during tag-during"><div class="w-title">🔥 大促期 <span class="tag">5/15–6/18</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#16a34a">+2,171,101</div><div class="w-snap">结束日 2,831,477</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#16a34a">+1,050,478</div><div class="w-snap">结束日 1,496,018</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#16a34a">+974,702</div><div class="w-snap">结束日 1,157,270</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#16a34a">+139,686</div><div class="w-snap">结束日 163,439</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+5,692</div><div class="w-snap">结束日 13,565</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+543</div><div class="w-snap">结束日 1,185</div></div></div></div><div class="w-card w-after tag-post"><div class="w-title">大促后 <span class="tag">6/19–7/11</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#16a34a">+1,001,757</div><div class="w-snap">结束日 4,077,513</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#16a34a">+471,494</div><div class="w-snap">结束日 2,083,132</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#16a34a">+414,303</div><div class="w-snap">结束日 1,680,237</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#16a34a">+111,105</div><div class="w-snap">结束日 293,994</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+4,519</div><div class="w-snap">结束日 18,596</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+336</div><div class="w-snap">结束日 1,554</div></div></div></div></div><div class="r-switch">
+<button class="r-btn active" data-r="total" style="--bc:#1a73e8;border-color:#1a73e8;color:#1a73e8">人群总资产 ((R1~R5合计))</button>
+<button class="r-btn" data-r="R1" style="--bc:#6366f1;border-color:#6366f1;color:#6366f1">R1 触达</button>
+<button class="r-btn" data-r="R2" style="--bc:#8b5cf6;border-color:#8b5cf6;color:#8b5cf6">R2 回应</button>
+<button class="r-btn" data-r="R3" style="--bc:#a78bfa;border-color:#a78bfa;color:#a78bfa">R3 共鸣</button>
+<button class="r-btn" data-r="R4" style="--bc:#c084fc;border-color:#c084fc;color:#c084fc">R4 行动</button>
+<button class="r-btn" data-r="R5" style="--bc:#e879f9;border-color:#e879f9;color:#e879f9">R5 信赖</button>
+</div>
+<div class="chart-wrap">
+<div class="chart-title" id="ctTitle">人群总资产 — 日趋势（绝对值）</div>
+<div class="chart-body"><canvas id="p1trend1"></canvas></div>
+</div>
+</div>
+</section><a id="p2"></a><section class="page-block p2-block">
+<div class="hd">
+<span>📊 <strong>店铺&amp;商品流转诊断</strong></span>
+<span class="hd-sub">MARUBI 丸美 · 大促前/期/后三时间窗对比</span>
+</div>
+<div class="bd">
+<!-- 店铺成交人数趋势（数据缺 R 分层，降级展示日 GMV 单线） -->
+<div class="store-section">
+<div class="sec-title">📈 店铺日成交趋势（4/10-7/11）</div>
+<div class="win-cards" style="margin-bottom:10px;display:flex;gap:4px;padding-left:46px;box-sizing:border-box"><div class="wcard pre" style="flex:35 1 0;min-width:0;border-top:4px solid #6366f1;background:#6366f10a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#6366f1"></span>大促前<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">22.0<span class="unit">万</span></div><div class="uv-line">GMV 合计 · 成交人数 820</div></div><div class="wcard during" style="flex:35 1 0;min-width:0;border-top:4px solid #ef4444;background:#ef44440a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#ef4444"></span>🔥 大促期<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">160.1<span class="unit">万</span></div><div class="uv-line">GMV 合计 · 成交人数 5,857</div></div><div class="wcard post" style="flex:23 1 0;min-width:0;border-top:4px solid #10b981;background:#10b9810a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#10b981"></span>大促后<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">245.7<span class="unit">万</span></div><div class="uv-line">GMV 合计 · 成交人数 9,089</div></div></div><div class="trend-wrap"><div style="position:relative;width:100%;height:320px"><canvas id="p2trend1"></canvas></div></div>
+</div>
+<!-- 5R 成交占比 (真实数据) -->
+<div class="bar-section"><div class="bar-title">📊 5R 成交占比（R1+R2 · R3 · R4+R5）</div><div style="padding:8px 4px 4px"><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#6366f1">大促前</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:91.8%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">91.8%</div><div style="width:6.2%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">6.2%</div><div style="width:2.0%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">2.0%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">388,242</span></div></div><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#ef4444">🔥 大促期</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:95.4%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">95.4%</div><div style="width:3.8%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">3.8%</div><div style="width:0.9%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">0.9%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">1,152,509</span></div></div><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#10b981">大促后</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:92.2%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">92.2%</div><div style="width:7.3%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">7.3%</div><div style="width:0.5%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">0.5%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">3,640,667</span></div></div></div><div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:#64748b"><span>■<b style="color:#3b82f6;margin-left:4px">R1+R2 触达+回应</b></span><span>■<b style="color:#f59e0b;margin-left:4px">R3 共鸣</b></span><span>■<b style="color:#ef4444;margin-left:4px">R4+R5 行动+信赖</b></span></div><div style="font-size:10px;color:#94a3b8;margin-top:6px">数据源：如翼 wxstore_5r_data 5R 人群 wuid_cnt（按 R 层聚合为 3 段）。各窗数值为该窗结束日 5R 资产快照。</div></div><div class="bar-section" style="margin-top:16px"><div class="bar-title">🔗 成交渠道分布（按5R层级）· GMV 占比</div><div style="display:flex;gap:8px;margin:10px 0 14px;justify-content:center"><button class="ch-r-tab active" data-rl="1" data-uid="ch2fa224" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#3b82f6;color:#fff;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R1</button><button class="ch-r-tab" data-rl="2" data-uid="ch2fa224" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R2</button><button class="ch-r-tab" data-rl="3" data-uid="ch2fa224" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R3</button><button class="ch-r-tab" data-rl="4" data-uid="ch2fa224" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R4</button><button class="ch-r-tab" data-rl="5" data-uid="ch2fa224" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R5</button></div><div class="ch-r-panels"><div class="ch-r-panel" data-rl="1" data-uid="ch2fa224"><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#3b82f6">视频号</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:80.9%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">80.9%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥15.4w</div><div style="font-size:10px;color:#94a3b8">576人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#a855f7">公众号与小程序</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:9.9%;background:#a855f7;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">9.9%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥1.9w</div><div style="font-size:10px;color:#94a3b8">73人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#f59e0b">朋友圈</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:5.8%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">5.8%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥1.1w</div><div style="font-size:10px;color:#94a3b8">42人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#94a3b8">其他</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:3.3%;background:#94a3b8;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">3.3%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.6w</div><div style="font-size:10px;color:#94a3b8">23人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:12px 6px;background:#f8fafc;border-radius:6px;margin-top:4px"><div style="font-weight:700;color:#334155">合计</div><div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥19.0w</div><div style="font-size:10px;color:#94a3b8">714人</div></div></div></div><div class="ch-r-panel" data-rl="2" data-uid="ch2fa224" style="display:none"><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#3b82f6">视频号</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:83.7%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">83.7%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥49.3w</div><div style="font-size:10px;color:#94a3b8">1,827人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#a855f7">公众号与小程序</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:9.4%;background:#a855f7;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">9.4%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥5.5w</div><div style="font-size:10px;color:#94a3b8">202人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#f59e0b">朋友圈</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:4.4%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">4.4%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥2.6w</div><div style="font-size:10px;color:#94a3b8">97人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#94a3b8">其他</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:2.5%;background:#94a3b8;height:100%;display:flex;align-items:center;justify-content:center;min-width:0px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">2.5%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥1.5w</div><div style="font-size:10px;color:#94a3b8">53人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:12px 6px;background:#f8fafc;border-radius:6px;margin-top:4px"><div style="font-weight:700;color:#334155">合计</div><div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥58.8w</div><div style="font-size:10px;color:#94a3b8">2,179人</div></div></div></div><div class="ch-r-panel" data-rl="3" data-uid="ch2fa224" style="display:none"><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#3b82f6">视频号</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:75.4%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">75.4%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥86.2w</div><div style="font-size:10px;color:#94a3b8">3,224人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#a855f7">公众号与小程序</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:15.1%;background:#a855f7;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">15.1%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥17.2w</div><div style="font-size:10px;color:#94a3b8">645人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#f59e0b">朋友圈</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:6.2%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">6.2%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥7.1w</div><div style="font-size:10px;color:#94a3b8">270人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#94a3b8">其他</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:3.3%;background:#94a3b8;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">3.3%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥3.8w</div><div style="font-size:10px;color:#94a3b8">144人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:12px 6px;background:#f8fafc;border-radius:6px;margin-top:4px"><div style="font-weight:700;color:#334155">合计</div><div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥114.3w</div><div style="font-size:10px;color:#94a3b8">4,283人</div></div></div></div><div class="ch-r-panel" data-rl="4" data-uid="ch2fa224" style="display:none"><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#3b82f6">视频号</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:76.8%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">76.8%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥5.9w</div><div style="font-size:10px;color:#94a3b8">217人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#a855f7">公众号与小程序</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:12.5%;background:#a855f7;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">12.5%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥1.0w</div><div style="font-size:10px;color:#94a3b8">35人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#f59e0b">朋友圈</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:7.3%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">7.3%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.6w</div><div style="font-size:10px;color:#94a3b8">24人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#94a3b8">其他</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:3.3%;background:#94a3b8;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">3.3%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.3w</div><div style="font-size:10px;color:#94a3b8">10人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:12px 6px;background:#f8fafc;border-radius:6px;margin-top:4px"><div style="font-weight:700;color:#334155">合计</div><div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥7.7w</div><div style="font-size:10px;color:#94a3b8">286人</div></div></div></div><div class="ch-r-panel" data-rl="5" data-uid="ch2fa224" style="display:none"><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#3b82f6">视频号</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:66.8%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">66.8%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥1.6w</div><div style="font-size:10px;color:#94a3b8">51人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#a855f7">公众号与小程序</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:17.5%;background:#a855f7;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">17.5%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.4w</div><div style="font-size:10px;color:#94a3b8">13人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#f59e0b">朋友圈</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:13.1%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;min-width:50px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">13.1%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.3w</div><div style="font-size:10px;color:#94a3b8">11人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:#94a3b8">其他</div><div style="display:flex;height:28px;border-radius:6px;overflow:hidden;background:#f8fafc"><div style="width:2.6%;background:#94a3b8;height:100%;display:flex;align-items:center;justify-content:center;min-width:0px;font-size:11px;color:#fff;font-weight:700;white-space:nowrap">2.6%</div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥0.1w</div><div style="font-size:10px;color:#94a3b8">3人</div></div></div><div style="display:grid;grid-template-columns:110px 1fr auto auto;gap:14px;align-items:center;padding:12px 6px;background:#f8fafc;border-radius:6px;margin-top:4px"><div style="font-weight:700;color:#334155">合计</div><div></div><div style="text-align:right"><div style="font-weight:700;color:#1e293b">¥2.4w</div><div style="font-size:10px;color:#94a3b8">78人</div></div></div></div></div><div style="display:flex;gap:20px;margin-top:12px;font-size:11px;color:#64748b;flex-wrap:wrap"><span>■ <b style="color:#3b82f6;margin-left:4px">视频号</b></span><span>■ <b style="color:#a855f7;margin-left:4px">公众号&amp;小程序</b></span><span>■ <b style="color:#f59e0b;margin-left:4px">朋友圈</b></span><span>■ <b style="color:#94a3b8;margin-left:4px">其他</b></span></div><div style="font-size:10px;color:#94a3b8;margin-top:6px">数据源：如翼 get_wxstore_trade_attr_detail（生意贡献→5R成交路径），按 r_level 参数分别拉取各触点真实 GMV/成交人数。</div></div><script>function switchChRTab(btn){  var rl=btn.getAttribute("data-rl"), uid=btn.getAttribute("data-uid");  btn.parentNode.querySelectorAll(".ch-r-tab").forEach(function(t){    t.style.background="#fff";t.style.color="#475569";t.classList.remove("active");  });  btn.style.background="#3b82f6";btn.style.color="#fff";btn.classList.add("active");  document.querySelectorAll(".ch-r-panel").forEach(function(p){    if(p.getAttribute("data-uid")===uid){      p.style.display=p.getAttribute("data-rl")===rl?"block":"none";    }  });}</script><!-- 成交渠道分布 (真实数据) -->
+<div class="ch-section"><div class="ch-title">🔗 八大触点 TGI · 三窗对比（如翼效果竞价 · TGI&gt;100 偏好更高）</div><div class="p3tabs" style="display:flex;gap:8px;margin:8px 0 12px"><button class="p3tab" data-w="before" data-uid="t2fa224" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569">大促前 · TOP 微信视频号</button><button class="p3tab active" data-w="during" data-uid="t2fa224" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#ef4444;color:#fff">🔥 大促期 · TOP 微信视频号</button><button class="p3tab" data-w="after" data-uid="t2fa224" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569">大促后 · TOP 微信视频号</button></div><div class="p3panels"><div class="p3panel" data-w="before" data-uid="t2fa224" style="display:none"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:43.3%;background:#f19a4a;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#f19a4a;font-weight:700">TGI 130 <span style="color:#94a3b8;font-weight:400">· 46.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:27.7%;background:#94a3b8;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#94a3b8;font-weight:700">TGI 83 <span style="color:#94a3b8;font-weight:400">· 7.3%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:22.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 68 <span style="color:#94a3b8;font-weight:400">· 22.5%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:11.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 33 <span style="color:#94a3b8;font-weight:400">· 19.4%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:7.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 23 <span style="color:#94a3b8;font-weight:400">· 1.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:7.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 22 <span style="color:#94a3b8;font-weight:400">· 0.4%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:5.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 15 <span style="color:#94a3b8;font-weight:400">· 1.6%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:4.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 14 <span style="color:#94a3b8;font-weight:400">· 0.8%</span></div></div></div><div class="p3panel" data-w="during" data-uid="t2fa224" style="display:block"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:59.7%;background:#f19a4a;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#f19a4a;font-weight:700">TGI 179 <span style="color:#94a3b8;font-weight:400">· 60.3%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:20.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 62 <span style="color:#94a3b8;font-weight:400">· 19.6%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:17.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 53 <span style="color:#94a3b8;font-weight:400">· 3.5%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:14.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 43 <span style="color:#94a3b8;font-weight:400">· 0.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:11.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 34 <span style="color:#94a3b8;font-weight:400">· 1.2%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:8.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 26 <span style="color:#94a3b8;font-weight:400">· 15.2%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 10 <span style="color:#94a3b8;font-weight:400">· 1.1%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 10 <span style="color:#94a3b8;font-weight:400">· 1.3%</span></div></div></div><div class="p3panel" data-w="after" data-uid="t2fa224" style="display:none"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:61.7%;background:#f19a4a;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#f19a4a;font-weight:700">TGI 185 <span style="color:#94a3b8;font-weight:400">· 61.6%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:29.0%;background:#94a3b8;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#94a3b8;font-weight:700">TGI 87 <span style="color:#94a3b8;font-weight:400">· 6.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:21.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 65 <span style="color:#94a3b8;font-weight:400">· 2.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:21.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 64 <span style="color:#94a3b8;font-weight:400">· 23.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:18.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 56 <span style="color:#94a3b8;font-weight:400">· 1.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:8.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 26 <span style="color:#94a3b8;font-weight:400">· 14.9%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:8.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 25 <span style="color:#94a3b8;font-weight:400">· 2.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 11 <span style="color:#94a3b8;font-weight:400">· 1.0%</span></div></div></div></div><div style="font-size:10px;color:#94a3b8;margin-top:8px">数据源：如翼 get_wxstore_5r_trigger（三窗各一次），取「效果竞价」下 8 触点，TGI 降序。色标：≥200 深红 / ≥120 橙 / ≥80 灰 / &lt;80 浅蓝。</div></div><!-- TOP8 商品流转诊断 (真实数据) -->
+<div class="prod-section">
+<div class="sec-title">📦 TOP 商品流转诊断</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:48px">#</th><th style="text-align:left;min-width:240px">商品名</th><th style="text-align:right;padding:6px 10px;width:120px">大促期 GMV</th></tr></thead>
+<tbody><tr><td><span class="rk rk1">1</span></td><td class="pname" title="[品牌周年庆典福利]丸美重组胶原蛋白抗皱紧致眼膜#">[品牌周年庆典福利]丸美重组胶原蛋白抗皱紧致眼膜#</td><td class="gmv-cell" style="text-align:right;padding:6px 10px;font-weight:700;color:#1a73e8">135.1万</td></tr><tr><td><span class="rk rk2">2</span></td><td class="pname" title="[7天淡纹]丸美S肽小红笔眼霜 多重胜肽全脸紧致淡纹焕亮眼霜20g 微电流美容仪眼霜#">[7天淡纹]丸美S肽小红笔眼霜 多重胜肽全脸紧致淡纹焕亮眼霜20g 微电流美容仪眼霜#</td><td class="gmv-cell" style="text-align:right;padding:6px 10px;font-weight:700;color:#1a73e8">13.1万</td></tr><tr><td><span class="rk rk3">3</span></td><td class="pname" title="[品牌周年庆典福利]丸美小金针眼膜  5盒重组胶原蛋白抗皱紧致眼膜5盒装超值囤货装#">[品牌周年庆典福利]丸美小金针眼膜  5盒重组胶原蛋白抗皱紧致眼膜5盒装超值囤货装#</td><td class="gmv-cell" style="text-align:right;padding:6px 10px;font-weight:700;color:#1a73e8">7.4万</td></tr></tbody>
+</table>
+</div>
+</div></div></section></div><!-- ═══════ SHOP 2 · MARUBI 丸美科技抗衰护肤店 ═══════ -->
+<div class="section-divider"><div class="div-line"></div></div>
+<div id="shop2" class="page-section">
+  <div class="shop-topbar">
+
+<div class="shop-name">🏪 MARUBI 丸美科技抗衰护肤店</div>
+<div class="anchor-nav">
+<a href="#p1">5R 资产</a>
+<a href="#p2">商品流转</a>
+
+
+</div>
+</div><a id="p1"></a><section class="page-block p1-block">
+<div class="hd">
+<span>📊 <strong>MARUBI 丸美科技抗衰护肤店 · 小店5R资产总览</strong></span>
+<span class="hd-sub">数值=时间窗内净变化(GAP)；大促前 4/10-5/14 / 大促期 5/15-6/18 / 大促后 6/19-7/11</span>
+</div>
+<div class="bd">
+<div class="w-row"><div class="w-card w-before tag-pre"><div class="w-title">大促前 <span class="tag">4/10–5/14</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#16a34a">+586,548</div><div class="w-snap">结束日 1,009,879</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#16a34a">+437,472</div><div class="w-snap">结束日 697,988</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#16a34a">+102,385</div><div class="w-snap">结束日 226,742</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#16a34a">+46,424</div><div class="w-snap">结束日 67,441</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+233</div><div class="w-snap">结束日 17,034</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+34</div><div class="w-snap">结束日 674</div></div></div></div><div class="w-card w-during tag-during"><div class="w-title">🔥 大促期 <span class="tag">5/15–6/18</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#DC2626">-993,759</div><div class="w-snap">结束日 17,721</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#DC2626">-698,589</div><div class="w-snap">结束日 0</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#DC2626">-227,642</div><div class="w-snap">结束日 0</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#DC2626">-67,536</div><div class="w-snap">结束日 0</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+5</div><div class="w-snap">结束日 17,044</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+3</div><div class="w-snap">结束日 677</div></div></div></div><div class="w-card w-after tag-post"><div class="w-title">大促后 <span class="tag">6/19–7/11</span></div><div class="w-grid"><div class="w-item"><div class="w-label">人群总资产<br/><span class="sub">(R1~R5合计)</span></div><div class="w-gap" style="color:#16a34a">+864,213</div><div class="w-snap">结束日 881,934</div></div><div class="w-item"><div class="w-label">R1 触达</div><div class="w-gap" style="color:#16a34a">+602,919</div><div class="w-snap">结束日 602,919</div></div><div class="w-item"><div class="w-label">R2 回应</div><div class="w-gap" style="color:#16a34a">+210,543</div><div class="w-snap">结束日 210,543</div></div><div class="w-item"><div class="w-label">R3 共鸣</div><div class="w-gap" style="color:#16a34a">+50,654</div><div class="w-snap">结束日 50,654</div></div><div class="w-item"><div class="w-label">R4 行动</div><div class="w-gap" style="color:#16a34a">+93</div><div class="w-snap">结束日 17,137</div></div><div class="w-item"><div class="w-label">R5 信赖</div><div class="w-gap" style="color:#16a34a">+4</div><div class="w-snap">结束日 681</div></div></div></div></div><div class="r-switch">
+<button class="r-btn active" data-r="total" style="--bc:#1a73e8;border-color:#1a73e8;color:#1a73e8">人群总资产 ((R1~R5合计))</button>
+<button class="r-btn" data-r="R1" style="--bc:#6366f1;border-color:#6366f1;color:#6366f1">R1 触达</button>
+<button class="r-btn" data-r="R2" style="--bc:#8b5cf6;border-color:#8b5cf6;color:#8b5cf6">R2 回应</button>
+<button class="r-btn" data-r="R3" style="--bc:#a78bfa;border-color:#a78bfa;color:#a78bfa">R3 共鸣</button>
+<button class="r-btn" data-r="R4" style="--bc:#c084fc;border-color:#c084fc;color:#c084fc">R4 行动</button>
+<button class="r-btn" data-r="R5" style="--bc:#e879f9;border-color:#e879f9;color:#e879f9">R5 信赖</button>
+</div>
+<div class="chart-wrap">
+<div class="chart-title" id="ctTitle">人群总资产 — 日趋势（绝对值）</div>
+<div class="chart-body"><canvas id="p1trend2"></canvas></div>
+</div>
+</div>
+</section><a id="p2"></a><section class="page-block p2-block">
+<div class="hd">
+<span>📊 <strong>店铺&amp;商品流转诊断</strong></span>
+<span class="hd-sub">MARUBI 丸美科技抗衰护肤店 · 大促前/期/后三时间窗对比</span>
+</div>
+<div class="bd">
+<!-- 店铺成交人数趋势（数据缺 R 分层，降级展示日 GMV 单线） -->
+<div class="store-section">
+<div class="sec-title">📈 店铺日成交趋势（4/10-7/11）</div>
+<div class="win-cards" style="margin-bottom:10px;display:flex;gap:4px;padding-left:46px;box-sizing:border-box"><div class="wcard pre" style="flex:35 1 0;min-width:0;border-top:4px solid #6366f1;background:#6366f10a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#6366f1"></span>大促前<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">8.1<span class="unit">万</span></div><div class="uv-line">GMV 合计 · 成交人数 275</div></div><div class="wcard during" style="flex:35 1 0;min-width:0;border-top:4px solid #ef4444;background:#ef44440a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#ef4444"></span>🔥 大促期<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">307.9<span class="unit">元</span></div><div class="uv-line">GMV 合计 · 成交人数 2</div></div><div class="wcard post" style="flex:23 1 0;min-width:0;border-top:4px solid #10b981;background:#10b9810a;border-radius:8px;padding:8px 12px;box-sizing:border-box;overflow:hidden"><div class="wlabel"><span class="dot" style="background:#10b981"></span>大促后<span style="float:right;font-size:10px;color:#94a3b8">▼</span></div><div class="big-num">2.4<span class="unit">万</span></div><div class="uv-line">GMV 合计 · 成交人数 78</div></div></div><div class="trend-wrap"><div style="position:relative;width:100%;height:320px"><canvas id="p2trend2"></canvas></div></div>
+</div>
+<!-- 5R 成交占比 (真实数据) -->
+<div class="bar-section"><div class="bar-title">📊 5R 成交占比（R1+R2 · R3 · R4+R5）</div><div style="padding:8px 4px 4px"><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#6366f1">大促前</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:91.0%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">91.0%</div><div style="width:6.3%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">6.3%</div><div style="width:2.7%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">2.7%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">661,073</span></div></div><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#ef4444">🔥 大促期</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:90.1%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">90.1%</div><div style="width:5.7%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">5.7%</div><div style="width:4.2%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">4.2%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">417,113</span></div></div><div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-size:13px;font-weight:700;color:#10b981">大促后</div><div><div style="display:flex;height:26px;border-radius:5px;overflow:hidden;background:#f1f5f9"><div style="width:24.1%;background:#3b82f6;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">24.1%</div><div style="width:0.6%;background:#f59e0b;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">0.6%</div><div style="width:75.2%;background:#ef4444;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;white-space:nowrap">75.2%</div></div></div><div style="font-size:11px;color:#64748b;text-align:right;white-space:nowrap">合计 <span style="color:#1e293b;font-weight:700">23,552</span></div></div></div><div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:#64748b"><span>■<b style="color:#3b82f6;margin-left:4px">R1+R2 触达+回应</b></span><span>■<b style="color:#f59e0b;margin-left:4px">R3 共鸣</b></span><span>■<b style="color:#ef4444;margin-left:4px">R4+R5 行动+信赖</b></span></div><div style="font-size:10px;color:#94a3b8;margin-top:6px">数据源：如翼 wxstore_5r_data 5R 人群 wuid_cnt（按 R 层聚合为 3 段）。各窗数值为该窗结束日 5R 资产快照。</div></div><div class="bar-section" style="margin-top:16px"><div class="bar-title">🔗 成交渠道分布（按5R层级）· GMV 占比</div><div style="display:flex;gap:8px;margin:10px 0 14px;justify-content:center"><button class="ch-r-tab active" data-rl="1" data-uid="ch163b08" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#3b82f6;color:#fff;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R1</button><button class="ch-r-tab" data-rl="2" data-uid="ch163b08" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R2</button><button class="ch-r-tab" data-rl="3" data-uid="ch163b08" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R3</button><button class="ch-r-tab" data-rl="4" data-uid="ch163b08" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R4</button><button class="ch-r-tab" data-rl="5" data-uid="ch163b08" style="padding:5px 18px;border-radius:16px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569;font-weight:700;transition:.2s"onclick="switchChRTab(this)">R5</button></div><div class="ch-r-panels"><div class="ch-r-panel" data-rl="1" data-uid="ch163b08"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">R1 渠道数据暂缺</div></div><div class="ch-r-panel" data-rl="2" data-uid="ch163b08" style="display:none"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">R2 渠道数据暂缺</div></div><div class="ch-r-panel" data-rl="3" data-uid="ch163b08" style="display:none"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">R3 渠道数据暂缺</div></div><div class="ch-r-panel" data-rl="4" data-uid="ch163b08" style="display:none"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">R4 渠道数据暂缺</div></div><div class="ch-r-panel" data-rl="5" data-uid="ch163b08" style="display:none"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">R5 渠道数据暂缺</div></div></div><div style="display:flex;gap:20px;margin-top:12px;font-size:11px;color:#64748b;flex-wrap:wrap"><span>■ <b style="color:#3b82f6;margin-left:4px">视频号</b></span><span>■ <b style="color:#a855f7;margin-left:4px">公众号&amp;小程序</b></span><span>■ <b style="color:#f59e0b;margin-left:4px">朋友圈</b></span><span>■ <b style="color:#94a3b8;margin-left:4px">其他</b></span></div><div style="font-size:10px;color:#94a3b8;margin-top:6px">数据源：暂无真实数据。</div></div><script>function switchChRTab(btn){  var rl=btn.getAttribute("data-rl"), uid=btn.getAttribute("data-uid");  btn.parentNode.querySelectorAll(".ch-r-tab").forEach(function(t){    t.style.background="#fff";t.style.color="#475569";t.classList.remove("active");  });  btn.style.background="#3b82f6";btn.style.color="#fff";btn.classList.add("active");  document.querySelectorAll(".ch-r-panel").forEach(function(p){    if(p.getAttribute("data-uid")===uid){      p.style.display=p.getAttribute("data-rl")===rl?"block":"none";    }  });}</script><!-- 成交渠道分布 (真实数据) -->
+<div class="ch-section"><div class="ch-title">🔗 八大触点 TGI · 三窗对比（如翼效果竞价 · TGI&gt;100 偏好更高）</div><div class="p3tabs" style="display:flex;gap:8px;margin:8px 0 12px"><button class="p3tab" data-w="before" data-uid="t163b08" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569">大促前 · TOP 微信公众号与小程序</button><button class="p3tab active" data-w="during" data-uid="t163b08" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#ef4444;color:#fff">🔥 大促期 · TOP 微信视频号</button><button class="p3tab" data-w="after" data-uid="t163b08" style="padding:6px 16px;border-radius:18px;cursor:pointer;font-size:12px;border:1px solid #e5e7eb;background:#fff;color:#475569">大促后 · TOP 微信公众号与小程序</button></div><div class="p3panels"><div class="p3panel" data-w="before" data-uid="t163b08" style="display:none"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:33.3%;background:#94a3b8;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#94a3b8;font-weight:700">TGI 100 <span style="color:#94a3b8;font-weight:400">· 57.5%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:29.7%;background:#94a3b8;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#94a3b8;font-weight:700">TGI 89 <span style="color:#94a3b8;font-weight:400">· 32.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:6.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 18 <span style="color:#94a3b8;font-weight:400">· 6.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:5.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 16 <span style="color:#94a3b8;font-weight:400">· 0.7%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:4.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 14 <span style="color:#94a3b8;font-weight:400">· 0.2%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:4.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 13 <span style="color:#94a3b8;font-weight:400">· 0.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 11 <span style="color:#94a3b8;font-weight:400">· 1.3%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 1 <span style="color:#94a3b8;font-weight:400">· 0.2%</span></div></div></div><div class="p3panel" data-w="during" data-uid="t163b08" style="display:block"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:42.7%;background:#f19a4a;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#f19a4a;font-weight:700">TGI 128 <span style="color:#94a3b8;font-weight:400">· 43.3%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:24.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 72 <span style="color:#94a3b8;font-weight:400">· 41.3%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:12.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 37 <span style="color:#94a3b8;font-weight:400">· 1.4%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:12.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 36 <span style="color:#94a3b8;font-weight:400">· 0.7%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:9.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 28 <span style="color:#94a3b8;font-weight:400">· 1.9%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:5.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 16 <span style="color:#94a3b8;font-weight:400">· 2.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:4.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 12 <span style="color:#94a3b8;font-weight:400">· 4.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.7%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 11 <span style="color:#94a3b8;font-weight:400">· 1.1%</span></div></div></div><div class="p3panel" data-w="after" data-uid="t163b08" style="display:none"><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信公众号与小程序</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:11.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 33 <span style="color:#94a3b8;font-weight:400">· 19.2%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信视频号</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:3.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 10 <span style="color:#94a3b8;font-weight:400">· 3.5%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯新闻</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:2.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 7 <span style="color:#94a3b8;font-weight:400">· 0.8%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">微信朋友圈</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 1 <span style="color:#94a3b8;font-weight:400">· 0.5%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">优量汇</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.3%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 1 <span style="color:#94a3b8;font-weight:400">· 0.1%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">腾讯视频</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 0 <span style="color:#94a3b8;font-weight:400">· 0.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ浏览器</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 0 <span style="color:#94a3b8;font-weight:400">· 0.0%</span></div></div><div style="display:grid;grid-template-columns:150px 1fr 92px;gap:10px;align-items:center;padding:5px 0"><div style="font-size:12px;color:#334155">QQ、腾讯音乐及游戏</div><div style="height:20px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden"><div style="height:100%;width:0.0%;background:#7ba3d9;border-radius:4px"></div></div><div style="text-align:right;font-size:12px;color:#7ba3d9;font-weight:700">TGI 0 <span style="color:#94a3b8;font-weight:400">· 0.0%</span></div></div></div></div><div style="font-size:10px;color:#94a3b8;margin-top:8px">数据源：如翼 get_wxstore_5r_trigger（三窗各一次），取「效果竞价」下 8 触点，TGI 降序。色标：≥200 深红 / ≥120 橙 / ≥80 灰 / &lt;80 浅蓝。</div></div><!-- TOP8 商品流转诊断 (真实数据) -->
+<div class="prod-section">
+<div class="sec-title">📦 TOP 商品流转诊断</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th style="width:48px">#</th><th style="text-align:left;min-width:240px">商品名</th><th style="text-align:right;padding:6px 10px;width:120px">大促期 GMV</th></tr></thead>
+<tbody><tr><td><span class="rk rk1">1</span></td><td class="pname" title="[美容仪眼霜]丸美S肽小红笔眼霜 多重胜肽全脸紧致淡纹焕亮眼霜30g#">[美容仪眼霜]丸美S肽小红笔眼霜 多重胜肽全脸紧致淡纹焕亮眼霜30g#</td><td class="gmv-cell" style="text-align:right;padding:6px 10px;font-weight:700;color:#1a73e8">0.0万</td></tr></tbody>
+</table>
+</div>
+</div></div></section></div>
+<div class="section-divider"><div class="div-line"></div></div>
+<div id="p4" class="page-section">
+  <div class="app">
+<div class="header">
+<div>
+<div class="crumb">📊 丸美 · 微信小店聚合 · 人群画像分析 <b>（基于 6 份标签洞察 · 三窗 × R1-R3/R4-R5）</b></div>
+<h1>R1-R3 vs R4-R5 分人群画像</h1>
+<div class="sub">大促前 4/10-5/14 · 大促中 5/15-6/18（大促期）· 大促后 6/19-7/11 ｜ 数据源：微信小店后台「标签洞察」导出</div>
+</div>
+<div class="h-right">
+<a class="btn" href="#home">← 返回总览</a>
+</div>
+</div>
+<div style="background:#fff;border-radius:12px;padding:16px 18px;margin-bottom:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #f59e0b">
+<div style="font-size:14px;font-weight:800;color:#1a2540;margin-bottom:6px">🎯 一句话人设</div>
+<div style="font-size:13px;line-height:1.9;color:#334155">40-49 岁为主力、女性占 99%+ 的<b>熟龄已婚护肤女性</b>；R4-R5 老客较 R1-R3 新客<b>更年长(40+ 87% vs 76%)、消费力更强(高消费 54%→大促后 67%)、护肤更精细</b>(眼部护理/精华/面霜 TGI 显著偏高)。</div>
+</div>
+<div style="font-size:14px;font-weight:700;color:#1a2540;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+<span>🏆 画像招牌</span>
+<span style="font-size:11px;color:#8da0c4;font-weight:400">R4-R5 大促期护肤偏好 TGI Top4（丸美核心赛道）</span>
+</div>
+<div class="badge-row"><div class="badge" style="border-top:4px solid #10b981"><div class="bl">R4-R5 · 大促期 · 护肤偏好</div><div class="bn">眼部护理<br/><span style="font-size:10px;color:#8da0c4">人群占比 2.4%</span></div><div class="bv"><span class="pct">TGI 412</span><span class="tgi" style="background:#10b9811a;color:#10b981">偏好度 4.1×</span></div></div><div class="badge" style="border-top:4px solid #10b981"><div class="bl">R4-R5 · 大促期 · 护肤偏好</div><div class="bn">面部精华<br/><span style="font-size:10px;color:#8da0c4">人群占比 5.2%</span></div><div class="bv"><span class="pct">TGI 312</span><span class="tgi" style="background:#10b9811a;color:#10b981">偏好度 3.1×</span></div></div><div class="badge" style="border-top:4px solid #10b981"><div class="bl">R4-R5 · 大促期 · 护肤偏好</div><div class="bn">乳液面霜<br/><span style="font-size:10px;color:#8da0c4">人群占比 5.8%</span></div><div class="bv"><span class="pct">TGI 298</span><span class="tgi" style="background:#10b9811a;color:#10b981">偏好度 3.0×</span></div></div><div class="badge" style="border-top:4px solid #10b981"><div class="bl">R4-R5 · 大促期 · 护肤偏好</div><div class="bn">面膜/局部贴<br/><span style="font-size:10px;color:#8da0c4">人群占比 5.6%</span></div><div class="bv"><span class="pct">TGI 293</span><span class="tgi" style="background:#10b9811a;color:#10b981">偏好度 2.9×</span></div></div></div>
+<div class="section-header">📋 三时间窗 · R1-R3(浅层新客) vs R4-R5(深层老客) 画像对比</div>
+<div class="tabs">
+<button class="tab-btn" data-tab="before" onclick="switchTab('before')">📅 大促前 4/10-5/14</button>
+<button class="tab-btn active" data-tab="during" onclick="switchTab('during')">📅 大促中 5/15-6/18 (大促期)</button>
+<button class="tab-btn" data-tab="after" onclick="switchTab('after')">📅 大促后 6/19-7/11</button>
+</div>
+<div class="tab-content " id="tab-before"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><div style="background:#e0f2fe;color:#0369a1;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R1-R3 女性 97.1%</div><div style="background:#fce7f3;color:#be185d;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R4-R5 女性 99.5%</div><div style="background:#f0fdf4;color:#166534;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600">该窗人群以熟龄已婚女性为绝对主力</div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:4px 0 10px">A · 基础人口画像(占比 %，R1-R3 vs R4-R5)</div><div class="chart-grid"><div class="chart-card"><h4>年龄分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_age_before"></canvas></div></div><div class="chart-card"><h4>消费水平<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_consume_before"></canvas></div></div><div class="chart-card scrollable"><h4>常住城市等级<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_city_before"></canvas></div></div><div class="chart-card scrollable"><h4>学历分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_edu_before"></canvas></div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">B · 婚育 · 资产 · 消费力(占比 %)</div><div class="chart-grid"><div class="chart-card scrollable"><h4>婚恋育儿<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_marry_before"></canvas></div></div><div class="chart-card scrollable"><h4>资产 · 金融持有<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_assetfin_before"></canvas></div></div></div><div class="chart-grid" style="margin-top:16px"><div class="chart-card"><h4>手机设备价格档(消费力代理)<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_price_before"></canvas></div></div><div class="chart-card" style="display:flex;flex-direction:column;justify-content:center"><div style="font-size:12.5px;line-height:1.9;color:#334155"><div style="font-weight:800;color:#1a2540;margin-bottom:6px">📌 本窗 R1-R3 vs R4-R5 差异</div>· 40 岁以上：R4-R5 <b style="color:#be185d">88%</b> vs R1-R3 76%，老客更年长<br/>· 高消费：R4-R5 <b style="color:#be185d">57%</b> vs R1-R3 52%，老客消费力更强<br/>· 眼部护理 TGI：R4-R5 <b style="color:#be185d">338</b>，深度用户护肤精细化需求突出</div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">C · 美妆护肤兴趣特征 TGI(&gt;100 即高于全网均值，越高越偏好)</div><div class="chart-card scrollable"><h4>护肤细分偏好 TGI<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span><span style="font-size:10px;color:#8da0c4;font-weight:400">丸美核心赛道 · 眼部护理/精华/面霜显著偏高</span></h4><div class="canvas-wrap"><canvas id="c_skin_before"></canvas></div></div></div>
+<div class="tab-content active" id="tab-during"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><div style="background:#e0f2fe;color:#0369a1;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R1-R3 女性 96.6%</div><div style="background:#fce7f3;color:#be185d;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R4-R5 女性 99.5%</div><div style="background:#f0fdf4;color:#166534;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600">该窗人群以熟龄已婚女性为绝对主力</div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:4px 0 10px">A · 基础人口画像(占比 %，R1-R3 vs R4-R5)</div><div class="chart-grid"><div class="chart-card"><h4>年龄分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_age_during"></canvas></div></div><div class="chart-card"><h4>消费水平<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_consume_during"></canvas></div></div><div class="chart-card scrollable"><h4>常住城市等级<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_city_during"></canvas></div></div><div class="chart-card scrollable"><h4>学历分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_edu_during"></canvas></div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">B · 婚育 · 资产 · 消费力(占比 %)</div><div class="chart-grid"><div class="chart-card scrollable"><h4>婚恋育儿<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_marry_during"></canvas></div></div><div class="chart-card scrollable"><h4>资产 · 金融持有<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_assetfin_during"></canvas></div></div></div><div class="chart-grid" style="margin-top:16px"><div class="chart-card"><h4>手机设备价格档(消费力代理)<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_price_during"></canvas></div></div><div class="chart-card" style="display:flex;flex-direction:column;justify-content:center"><div style="font-size:12.5px;line-height:1.9;color:#334155"><div style="font-weight:800;color:#1a2540;margin-bottom:6px">📌 本窗 R1-R3 vs R4-R5 差异</div>· 40 岁以上：R4-R5 <b style="color:#be185d">87%</b> vs R1-R3 76%，老客更年长<br/>· 高消费：R4-R5 <b style="color:#be185d">66%</b> vs R1-R3 54%，老客消费力更强<br/>· 眼部护理 TGI：R4-R5 <b style="color:#be185d">412</b>，深度用户护肤精细化需求突出</div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">C · 美妆护肤兴趣特征 TGI(&gt;100 即高于全网均值，越高越偏好)</div><div class="chart-card scrollable"><h4>护肤细分偏好 TGI<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span><span style="font-size:10px;color:#8da0c4;font-weight:400">丸美核心赛道 · 眼部护理/精华/面霜显著偏高</span></h4><div class="canvas-wrap"><canvas id="c_skin_during"></canvas></div></div></div>
+<div class="tab-content " id="tab-after"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><div style="background:#e0f2fe;color:#0369a1;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R1-R3 女性 97.7%</div><div style="background:#fce7f3;color:#be185d;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700">R4-R5 女性 99.4%</div><div style="background:#f0fdf4;color:#166534;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600">该窗人群以熟龄已婚女性为绝对主力</div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:4px 0 10px">A · 基础人口画像(占比 %，R1-R3 vs R4-R5)</div><div class="chart-grid"><div class="chart-card"><h4>年龄分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_age_after"></canvas></div></div><div class="chart-card"><h4>消费水平<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_consume_after"></canvas></div></div><div class="chart-card scrollable"><h4>常住城市等级<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_city_after"></canvas></div></div><div class="chart-card scrollable"><h4>学历分布<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_edu_after"></canvas></div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">B · 婚育 · 资产 · 消费力(占比 %)</div><div class="chart-grid"><div class="chart-card scrollable"><h4>婚恋育儿<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_marry_after"></canvas></div></div><div class="chart-card scrollable"><h4>资产 · 金融持有<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_assetfin_after"></canvas></div></div></div><div class="chart-grid" style="margin-top:16px"><div class="chart-card"><h4>手机设备价格档(消费力代理)<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span></h4><div class="canvas-wrap"><canvas id="c_price_after"></canvas></div></div><div class="chart-card" style="display:flex;flex-direction:column;justify-content:center"><div style="font-size:12.5px;line-height:1.9;color:#334155"><div style="font-weight:800;color:#1a2540;margin-bottom:6px">📌 本窗 R1-R3 vs R4-R5 差异</div>· 40 岁以上：R4-R5 <b style="color:#be185d">86%</b> vs R1-R3 73%，老客更年长<br/>· 高消费：R4-R5 <b style="color:#be185d">67%</b> vs R1-R3 52%，老客消费力更强<br/>· 眼部护理 TGI：R4-R5 <b style="color:#be185d">440</b>，深度用户护肤精细化需求突出</div></div></div><div style="font-weight:700;font-size:14px;color:#1a2540;margin:18px 0 10px">C · 美妆护肤兴趣特征 TGI(&gt;100 即高于全网均值，越高越偏好)</div><div class="chart-card scrollable"><h4>护肤细分偏好 TGI<span class="chip r13">R1-R3</span><span class="chip r45">R4-R5</span><span style="font-size:10px;color:#8da0c4;font-weight:400">丸美核心赛道 · 眼部护理/精华/面霜显著偏高</span></h4><div class="canvas-wrap"><canvas id="c_skin_after"></canvas></div></div></div>
+<div class="section-header">🧭 关键洞察 &amp; 运营建议</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+<div style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+<div style="font-size:13px;font-weight:800;color:#1a4cd9;margin-bottom:8px">① 老客更年长更有钱</div>
+<div style="font-size:12px;line-height:1.85;color:#475569">R4-R5 深层老客 40 岁以上占比达 <b>87%</b>（新客仅 76%），高消费占比大促后升至 <b>67%</b>。建议对老客主推高客单抗衰精华/眼霜套组，强化「越熟越懂」的价值感。</div>
+</div>
+<div style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+<div style="font-size:13px;font-weight:800;color:#be185d;margin-bottom:8px">② 眼部护理是丸美的锚</div>
+<div style="font-size:12px;line-height:1.85;color:#475569">R4-R5 护肤细分中 <b>眼部护理 TGI 达 412</b>、面部精华 312、乳液面霜 298，远高于全网。丸美眼霜心智已深植老客，应以眼霜为钩子做「精华+面霜」连带升级。</div>
+</div>
+<div style="background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,.05)">
+<div style="font-size:13px;font-weight:800;color:#059669;margin-bottom:8px">③ 已婚有娃 · 家庭决策</div>
+<div style="font-size:12px;line-height:1.85;color:#475569">已婚占比 <b>90%</b>，孩子多在 6-18 岁。人群以三四线与新一线的服务业/教育/医护女性为主。内容宜走「妈妈自我关爱」「熟龄逆龄」情感沟通，投放侧重视频号+朋友圈。</div>
+</div>
+</div>
+<div style="font-size:10px;color:#94a3b8;margin-bottom:8px">说明：占比=该标签在对应人群中的占比；TGI&gt;100 表示相对全网人群偏好更高。数据源为微信小店后台「标签洞察」6 份导出（前/中/后 × R1-R3/R4-R5），2026-07-15 导出。</div>
+<script>
+// ===== P4 人群画像脚本（真实数据 · 三窗 R1-R3 vs R4-R5）=====
+const P4DATA = {"before": {"gender": {"r13": {"男": {"pct": 2.91, "tgi": 5.0}, "女": {"pct": 97.09, "tgi": 222.0}}, "r45": {"男": {"pct": 0.55, "tgi": 1.0}, "女": {"pct": 99.45, "tgi": 227.0}}}, "age": {"labels": ["18-24", "25-29", "30-39", "40-49", "50及以上"], "r13": [0.78, 1.35, 21.38, 41.07, 35.42], "r45": [0.16, 0.28, 11.66, 50.08, 37.82]}, "consume": {"labels": ["高", "中", "低"], "r13": [51.63, 30.83, 17.54], "r45": [57.28, 35.13, 7.59]}, "city": {"labels": ["一线城市", "新一线城市", "二线城市", "三线城市", "四线城市", "五线城市", "其他城市"], "r13": [13.26, 18.76, 19.53, 21.56, 16.87, 14.0, 1.29], "r45": [9.48, 17.43, 18.45, 23.81, 17.79, 17.03, 0.93]}, "edu": {"labels": ["小学", "初中", "高中", "专科", "本科", "硕士", "博士"], "r13": [10.4, 34.07, 32.56, 7.02, 16.77, 2.55, 0.12], "r45": [7.73, 35.78, 39.31, 7.4, 11.75, 1.56, 0.06]}, "marry": {"labels": ["已婚", "单身", "恋爱", "育儿（孩子6-12周岁）", "育儿（孩子12-15周岁）", "育儿（孩子15-18周岁）"], "r13": [85.93, 8.18, 4.9, 33.86, 28.91, 30.17], "r45": [91.16, 4.4, 2.72, 32.16, 29.5, 32.75]}, "asset": {"labels": ["预测有房人士", "预测有车人士"], "r13": [87.11, 67.85], "r45": [87.6, 65.62]}, "finance": {"labels": ["银行", "证券", "保险"], "r13": [66.75, 28.71, 22.84], "r45": [71.1, 27.43, 17.19]}, "price": {"labels": ["≤2500元", "2501-4500", "5000-6999", "7000元+"], "r13": [21.9, 18.4, 26.8, 32.9], "r45": [19.5, 23.5, 29.8, 27.2]}, "skin": {"labels": ["眼部护理", "面部精华", "乳液面霜", "面膜、局部贴", "面部护理套装", "化妆水", "面部防晒", "洁面"], "r13": [442, 374, 387, 351, 332, 200, 315, 83], "r45": [338, 259, 276, 283, 236, 248, 197, 91]}, "assetfin": {"labels": ["有房", "有车", "银行", "证券", "保险"], "r13": [87.11, 67.85, 66.75, 28.71, 22.84], "r45": [87.6, 65.62, 71.1, 27.43, 17.19]}}, "during": {"gender": {"r13": {"男": {"pct": 3.39, "tgi": 6.0}, "女": {"pct": 96.61, "tgi": 221.0}}, "r45": {"男": {"pct": 0.55, "tgi": 1.0}, "女": {"pct": 99.45, "tgi": 227.0}}}, "age": {"labels": ["18-24", "25-29", "30-39", "40-49", "50及以上"], "r13": [0.7, 1.51, 22.21, 44.41, 31.16], "r45": [0.2, 0.29, 12.96, 49.1, 37.46]}, "consume": {"labels": ["高", "中", "低"], "r13": [54.2, 33.87, 11.93], "r45": [65.61, 28.86, 5.53]}, "city": {"labels": ["一线城市", "新一线城市", "二线城市", "三线城市", "四线城市", "五线城市", "其他城市"], "r13": [12.45, 19.12, 19.79, 21.82, 16.45, 14.49, 1.35], "r45": [11.64, 19.59, 19.3, 22.3, 16.19, 14.72, 1.08]}, "edu": {"labels": ["小学", "初中", "高中", "专科", "本科", "硕士", "博士"], "r13": [7.66, 32.39, 34.53, 7.69, 17.99, 2.71, 0.14], "r45": [7.12, 33.55, 39.05, 7.59, 13.68, 2.13, 0.12]}, "marry": {"labels": ["已婚", "单身", "恋爱", "育儿（孩子6-12周岁）", "育儿（孩子12-15周岁）", "育儿（孩子15-18周岁）"], "r13": [86.3, 7.73, 5.49, 34.07, 29.88, 31.42], "r45": [89.76, 4.75, 3.6, 32.78, 30.98, 33.68]}, "asset": {"labels": ["预测有房人士", "预测有车人士"], "r13": [86.45, 69.41], "r45": [88.62, 69.51]}, "finance": {"labels": ["银行", "证券", "保险"], "r13": [68.82, 27.38, 21.54], "r45": [71.92, 28.32, 17.43]}, "price": {"labels": ["≤2500元", "2501-4500", "5000-6999", "7000元+"], "r13": [17.0, 20.5, 29.7, 32.8], "r45": [15.1, 19.3, 30.2, 35.4]}, "skin": {"labels": ["眼部护理", "面部精华", "乳液面霜", "面膜、局部贴", "面部护理套装", "化妆水", "面部防晒", "洁面"], "r13": [405, 338, 356, 329, 333, 205, 288, 84], "r45": [412, 312, 298, 293, 244, 243, 220, 88]}, "assetfin": {"labels": ["有房", "有车", "银行", "证券", "保险"], "r13": [86.45, 69.41, 68.82, 27.38, 21.54], "r45": [88.62, 69.51, 71.92, 28.32, 17.43]}}, "after": {"gender": {"r13": {"男": {"pct": 2.35, "tgi": 4.0}, "女": {"pct": 97.65, "tgi": 223.0}}, "r45": {"男": {"pct": 0.6, "tgi": 1.0}, "女": {"pct": 99.4, "tgi": 227.0}}}, "age": {"labels": ["18-24", "25-29", "30-39", "40-49", "50及以上"], "r13": [0.61, 1.77, 24.39, 43.68, 29.55], "r45": [0.2, 0.37, 13.55, 48.49, 37.39]}, "consume": {"labels": ["高", "中", "低"], "r13": [52.34, 35.91, 11.75], "r45": [67.42, 27.49, 5.09]}, "city": {"labels": ["一线城市", "新一线城市", "二线城市", "三线城市", "四线城市", "五线城市", "其他城市"], "r13": [13.05, 19.99, 20.04, 21.25, 15.94, 14.0, 1.35], "r45": [12.35, 19.94, 19.67, 21.84, 15.66, 14.27, 1.16]}, "edu": {"labels": ["小学", "初中", "高中", "专科", "本科", "硕士", "博士"], "r13": [7.64, 31.85, 33.42, 7.99, 19.23, 2.82, 0.15], "r45": [6.91, 33.13, 38.59, 7.73, 14.42, 2.31, 0.11]}, "marry": {"labels": ["已婚", "单身", "恋爱", "育儿（孩子6-12周岁）", "育儿（孩子12-15周岁）", "育儿（孩子15-18周岁）"], "r13": [86.09, 7.83, 5.98, 35.74, 30.03, 30.91], "r45": [89.22, 4.93, 3.86, 32.74, 30.61, 33.81]}, "asset": {"labels": ["预测有房人士", "预测有车人士"], "r13": [86.52, 68.96], "r45": [88.8, 70.62]}, "finance": {"labels": ["银行", "证券", "保险"], "r13": [69.53, 27.18, 21.11], "r45": [72.32, 28.19, 17.37]}, "price": {"labels": ["≤2500元", "2501-4500", "5000-6999", "7000元+"], "r13": [17.0, 20.6, 30.0, 32.4], "r45": [13.6, 18.1, 30.1, 38.3]}, "skin": {"labels": ["眼部护理", "面部精华", "乳液面霜", "面膜、局部贴", "面部护理套装", "化妆水", "面部防晒", "洁面"], "r13": [381, 320, 340, 304, 328, 193, 278, 85], "r45": [440, 297, 293, 293, 234, 266, 212, 88]}, "assetfin": {"labels": ["有房", "有车", "银行", "证券", "保险"], "r13": [86.52, 68.96, 69.53, 27.18, 21.11], "r45": [88.8, 70.62, 72.32, 28.19, 17.37]}}};
+const MARRY_SHORT = ["已婚", "单身", "恋爱", "娃6-12岁", "娃12-15岁", "娃15-18岁"];
+const SKIN_LABELS = ["眼部护理", "面部精华", "乳液面霜", "面膜/局部贴", "面部护理套装", "化妆水", "面部防晒", "洁面"];
+const CLR = { r13: { bg:'rgba(59,130,246,.55)', bd:'#2563eb' }, r45: { bg:'rgba(236,72,153,.6)', bd:'#be185d' } };
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#1a2540';
+const P4charts = {};
+const P4rendered = new Set();
+
+function p4bar(cid, labels, r13, r45, horiz, unit) {
+  const el = document.getElementById(cid); if(!el) return;
+  P4charts[cid] = new Chart(el.getContext('2d'), {
+    type:'bar',
+    data:{labels:labels, datasets:[
+      {label:'R1-R3', data:r13, backgroundColor:CLR.r13.bg, borderColor:CLR.r13.bd, borderWidth:1.2, borderRadius:4, barPercentage:0.7, categoryPercentage:0.82},
+      {label:'R4-R5', data:r45, backgroundColor:CLR.r45.bg, borderColor:CLR.r45.bd, borderWidth:1.2, borderRadius:4, barPercentage:0.7, categoryPercentage:0.82}
+    ]},
+    options:{
+      indexAxis: horiz?'y':'x', responsive:true, maintainAspectRatio:false, animation:{duration:500},
+      plugins:{
+        legend:{display:true, position:'top', align:'end', labels:{boxWidth:12, padding:8, usePointStyle:true, pointStyle:'rectRounded', font:{size:11,weight:'600'}}},
+        tooltip:{callbacks:{label:(c)=>c.dataset.label+': '+c.raw+unit}}
+      },
+      scales:{
+        x:{grid:{color:'#f1f5f9'}, ticks:{font:{size:10},color:'#5d6f93'}, beginAtZero:true},
+        y:{grid:{color:'#f1f5f9'}, ticks:{font:{size:10},color:'#5d6f93'}, beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderP4Tab(w) {
+  if(P4rendered.has(w)) { Object.values(P4charts).forEach(c=>{if(c.canvas.id.endsWith('_'+w)) c.resize();}); return; }
+  const d = P4DATA[w]; if(!d) return;
+  p4bar('c_age_'+w, d.age.labels, d.age.r13, d.age.r45, false, '%');
+  p4bar('c_consume_'+w, d.consume.labels, d.consume.r13, d.consume.r45, false, '%');
+  p4bar('c_city_'+w, d.city.labels, d.city.r13, d.city.r45, true, '%');
+  p4bar('c_edu_'+w, d.edu.labels, d.edu.r13, d.edu.r45, true, '%');
+  p4bar('c_marry_'+w, MARRY_SHORT, d.marry.r13, d.marry.r45, true, '%');
+  p4bar('c_assetfin_'+w, d.assetfin.labels, d.assetfin.r13, d.assetfin.r45, true, '%');
+  p4bar('c_price_'+w, d.price.labels, d.price.r13, d.price.r45, false, '%');
+  p4bar('c_skin_'+w, SKIN_LABELS, d.skin.r13, d.skin.r45, true, ' TGI');
+  P4rendered.add(w);
+}
+
+function switchTab(w) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===w));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active', c.id==='tab-'+w));
+  requestAnimationFrame(()=>renderP4Tab(w));
+}
+window.initP4Charts = () => renderP4Tab('during');
+let p4rt=null;
+window.addEventListener('resize', ()=>{clearTimeout(p4rt); p4rt=setTimeout(()=>Object.values(P4charts).forEach(c=>c.resize()),200);});
+  </script>
+</div>
+<!-- ═══════ 全局脚本 ═══════ -->
+<script>
+// 导航高亮
+(function() {
+  var nav = document.getElementById('globalNav');
+  var links = nav.querySelectorAll('a');
+  var sections = [];
+  links.forEach(function(a) {
+    var href = a.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      sections.push(document.querySelector(href));
+    }
+  });
+
+  links.forEach(function(a) {
+    a.addEventListener('click', function() {
+      links.forEach(function(l) { l.classList.remove('active'); });
+      a.classList.add('active');
+    });
+  });
+
+  var ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        var scrollY = window.scrollY + 120;
+        var current = 'home';
+        sections.forEach(function(sec) {
+          if (sec && sec.offsetTop <= scrollY) {
+            current = sec.id;
+          }
+        });
+        links.forEach(function(a) {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+// P4 图表懒加载
+(function() {
+  var p4Section = document.getElementById('p4');
+  var p4Ready = false;
+
+  function tryInitP4() {
+    if (p4Ready || !p4Section || !window.initP4Charts) return;
+    var rect = p4Section.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 800) {
+      p4Ready = true;
+      try { window.initP4Charts(); } catch(e) { console.warn('P4:', e); }
+    }
+  }
+
+  window.addEventListener('scroll', function() { tryInitP4(); });
+  var p4Link = document.querySelector('a[href="#p4"]');
+  if (p4Link) p4Link.addEventListener('click', function() { setTimeout(tryInitP4, 1000); });
+  setTimeout(tryInitP4, 2000);
+})();
+
+// R 切换：r-btn（人群资产 R1~R5 切换） + r-tab（渠道分布 R1~R5 切换）
+(function() {
+  var RBTN_LABELS = { total: '人群总资产', R1: 'R1 触达', R2: 'R2 回应', R3: 'R3 共鸣', R4: 'R4 行动', R5: 'R5 信赖' };
+
+  // 1) r-btn：每个 .r-switch 内的按钮 → 切 chart-layer
+  document.querySelectorAll('.r-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var sw = this.closest('.r-switch');
+      if (!sw) return;
+      sw.querySelectorAll('.r-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+
+      var wrap = sw.nextElementSibling;  // .chart-wrap
+      if (!wrap) return;
+      var r = this.getAttribute('data-r');
+      wrap.querySelectorAll('.chart-layer').forEach(function(layer) {
+        layer.style.display = (layer.getAttribute('data-r') === r) ? 'block' : 'none';
+      });
+
+      var titleEl = wrap.querySelector('.chart-title');
+      if (titleEl) {
+        var label = RBTN_LABELS[r] || this.textContent.trim();
+        titleEl.textContent = label + ' — 日趋势（绝对值）';
+      }
+    });
+  });
+
+  // 2) r-tab：每个 .r-tabs 内的 div → 切 ch-panel（同一 .ch-section 内）
+  document.querySelectorAll('.r-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var tabs = this.parentElement;
+      if (!tabs) return;
+      tabs.querySelectorAll('.r-tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+
+      var chSection = tabs.parentElement;
+      if (!chSection) return;
+      var r = this.getAttribute('data-r');
+      chSection.querySelectorAll('.ch-panel').forEach(function(p) {
+        p.style.display = (p.getAttribute('data-r') === r) ? 'block' : 'none';
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var WCOL={before:'#6366f1',during:'#ef4444',after:'#10b981'};
+  var WLBL={before:'大促前',during:'大促期',after:'大促后'};
+  var WIN_ORDER=['before','during','after'];
+  // 固定三窗时间边界（Unix 毫秒，UTC）：before 4/10-5/14 / during 5/15-6/18 / after 6/19-7/11
+  function ms(y,m,d){return Date.UTC(y,m-1,d);}
+  var WBOUNDS={
+    before:[ms(2026,4,10),ms(2026,5,14)],
+    during:[ms(2026,5,15),ms(2026,6,18)],
+    after: [ms(2026,6,19),ms(2026,7,11)]
+  };
+  var XMIN=WBOUNDS.before[0], XMAX=WBOUNDS.after[1];
+  var RCOL={total:'#1a73e8',R1:'#6366f1',R2:'#8b5cf6',R3:'#a78bfa',R4:'#c084fc',R5:'#e879f9'};
+  var RLBL={total:'人群总资产',R1:'R1 触达',R2:'R2 回应',R3:'R3 共鸣',R4:'R4 行动',R5:'R5 信赖'};
+  function ordToMD(ms){var d=new Date(ms);return(d.getUTCMonth()+1)+'/'+d.getUTCDate();}
+
+  // ── 三窗背景色带 plugin：紫/红/绿分区 + 窗名标签 + 底部日期范围 ──
+  //    消除区间缝隙：每区向两侧各扩展 0.5px，保证像素级无缝衔接
+  var winBands={
+    id:'winBands',
+    beforeDraw:function(chart){
+      var xs=chart.scales.x, area=chart.chartArea, ctx=chart.ctx;
+      if(!xs||!area)return;
+      WIN_ORDER.forEach(function(w){
+        var b=WBOUNDS[w];
+        var x0=Math.max(area.left, xs.getPixelForValue(b[0])-0.5);
+        var x1=Math.min(area.right, xs.getPixelForValue(b[1])+0.5);
+        if(x1<=x0)return;
+        ctx.save();
+        // 分区底色（15% 不透明度，更明显）
+        ctx.fillStyle=WCOL[w]+'26';
+        ctx.fillRect(Math.round(x0), area.top, Math.round(x1-x0), area.bottom-area.top);
+        // 分隔竖实线（窗右边界，更醒目）
+        if(w!=='after'){
+          ctx.strokeStyle=WCOL[w]+'88'; ctx.setLineDash([]); ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(x1, area.top); ctx.lineTo(x1, area.bottom); ctx.stroke();
+        }
+        // 顶部窗名标签（白底圆角 badge）
+        ctx.setLineDash([]);
+        var cx=(x0+x1)/2, txt=WLBL[w];
+        ctx.font='700 12px -apple-system,PingFang SC,sans-serif';
+        var tw=ctx.measureText(txt).width;
+        ctx.fillStyle='rgba(255,255,255,0.92)';
+        roundRect(ctx, cx-tw/2-6, area.top+2, tw+12, 20, 4);
+        ctx.fill();
+        ctx.fillStyle=WCOL[w]; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(txt, cx, area.top+12);
+        // 底部日期范围
+        ctx.fillStyle='#94a3b8'; ctx.font='400 10px -apple-system,PingFang SC,sans-serif';
+        ctx.textBaseline='bottom';
+        ctx.fillText(ordToMD(b[0])+'–'+ordToMD(b[1]), cx, area.bottom-3);
+        ctx.restore();
+      });
+    }
+  };
+  // 圆角矩形辅助函数
+  function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+  // P2 折线：单条线，但按点所属窗着色（segment.borderColor），并在空档处断线
+  function buildP2Dataset(pts){
+    // pts 已按 x 升序；构造 {x,y} 数组
+    var data=pts.map(function(p){return{x:p.x,y:p.y,win:p.win};});
+    return[{
+      label:'日 GMV', data:data,
+      borderColor:WCOL.during, borderWidth:2, pointRadius:1.5, pointHoverRadius:4,
+      pointBackgroundColor:function(c){var p=c.raw;return p?WCOL[p.win]||WCOL.during:WCOL.during;},
+      pointBorderColor:'#fff', pointBorderWidth:0.5, tension:0.25, fill:false,
+      segment:{borderColor:function(c){var p=c.p1.raw;return p?WCOL[p.win]||WCOL.during:WCOL.during;}}
+    }];
+  }
+  function drawP2(id,obj){
+    var c=document.getElementById(id);if(!c||!obj||!obj.pts||!obj.pts.length)return;
+    var ymax=Math.max.apply(null,obj.pts.map(function(p){return p.y;}));
+    var yfmt=ymax>=20000?function(v){return(v/10000).toFixed(0)+'万';}:(ymax>=2000?function(v){return(v/1000).toFixed(0)+'k';}:function(v){return v;});
+    var vfmt=ymax>=20000?function(v){return v==null?'—':(v/10000).toFixed(1)+'万';}:function(v){return v==null?'—':Math.round(v).toLocaleString()+'元';};
+    new Chart(c,{type:'line',data:{datasets:buildP2Dataset(obj.pts)},plugins:[winBands],options:{
+      parsing:false,responsive:true,maintainAspectRatio:false,animation:{duration:600},
+      interaction:{mode:'nearest',axis:'x',intersect:false},
+      layout:{padding:{top:18}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{title:function(it){return it.length?ordToMD(it[0].parsed.x):'';},label:function(ctx){return (WLBL[ctx.raw&&ctx.raw.win]||'')+' · 日 GMV：'+vfmt(ctx.parsed.y);}}}},
+      scales:{
+        x:{type:'linear',min:XMIN,max:XMAX,grid:{display:false},ticks:{font:{size:10},color:'#5d6f93',maxRotation:0,autoSkip:true,maxTicksLimit:12,callback:function(v){return ordToMD(v);}}},
+        y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10},color:'#5d6f93',callback:yfmt},title:{display:true,text:'日 GMV',font:{size:10,weight:'600'}}}
+      }
+    }});
+  }
+
+  function drawP1(id,obj){
+    var c=document.getElementById(id);if(!c||!obj||!obj.dates||!obj.dates.length)return;
+    var dates=obj.dates;
+    var rKeys=['total','R1','R2','R3','R4','R5'];
+    var datasets=rKeys.map(function(rk,ri){
+      var yArr=obj.r[ri]||[];
+      return{label:RLBL[rk],
+        data:dates.map(function(d,i){return yArr[i]!=null?{x:d.x,y:yArr[i]}:null;}),
+        borderColor:RCOL[rk],backgroundColor:RCOL[rk]+'18',
+        borderWidth:2,pointRadius:1.2,pointHoverRadius:4,
+        pointBackgroundColor:RCOL[rk],pointBorderColor:'#fff',pointBorderWidth:0.5,
+        tension:0.25,fill:false,spanGaps:false,   // 空档断线，不跨空档画直线
+        hidden:rk!=='total'};
+    });
+    var allYs=[];
+    datasets.forEach(function(ds){ds.data.forEach(function(p){if(p&&p.y!=null)allYs.push(p.y);});});
+    var ymax=Math.max.apply(null,allYs);
+    var yfmt=ymax>=2000000?function(v){return(v/10000).toFixed(0)+'万';}:(ymax>=200000?function(v){return(v/1000).toFixed(0)+'k';}:function(v){return Math.round(v).toLocaleString();});
+    var vfmt=ymax>=2000000?function(v){return v==null?'—':(v/10000).toFixed(1)+'万';}:function(v){return v==null?'—':Math.round(v).toLocaleString();};
+    return new Chart(c,{type:'line',data:{datasets:datasets},plugins:[winBands],options:{
+      parsing:false,responsive:true,maintainAspectRatio:false,animation:{duration:400},
+      interaction:{mode:'nearest',axis:'x',intersect:false},
+      layout:{padding:{top:18}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{title:function(it){return it.length?ordToMD(it[0].parsed.x):'';},label:function(ctx){return ctx.dataset.label+'：'+vfmt(ctx.parsed.y);}}}},
+      scales:{
+        x:{type:'linear',min:XMIN,max:XMAX,grid:{display:false},ticks:{font:{size:10},color:'#5d6f93',maxRotation:0,autoSkip:true,maxTicksLimit:12,callback:function(v){return ordToMD(v);}}},
+        y:{beginAtZero:true,grid:{color:'#f1f5f9'},ticks:{font:{size:10},color:'#5d6f93',callback:yfmt},title:{display:true,text:'人数',font:{size:10,weight:'600'}}}
+      }
+    }});
+  }
+
+  var C1={"1": {"dates": [{"x": 1776211200000, "d": "4/15", "win": "before"}, {"x": 1776297600000, "d": "4/16", "win": "before"}, {"x": 1776384000000, "d": "4/17", "win": "before"}, {"x": 1776470400000, "d": "4/18", "win": "before"}, {"x": 1776556800000, "d": "4/19", "win": "before"}, {"x": 1776643200000, "d": "4/20", "win": "before"}, {"x": 1776729600000, "d": "4/21", "win": "before"}, {"x": 1776816000000, "d": "4/22", "win": "before"}, {"x": 1776902400000, "d": "4/23", "win": "before"}, {"x": 1776988800000, "d": "4/24", "win": "before"}, {"x": 1777075200000, "d": "4/25", "win": "before"}, {"x": 1777161600000, "d": "4/26", "win": "before"}, {"x": 1777248000000, "d": "4/27", "win": "before"}, {"x": 1777334400000, "d": "4/28", "win": "before"}, {"x": 1777420800000, "d": "4/29", "win": "before"}, {"x": 1777507200000, "d": "4/30", "win": "before"}, {"x": 1777593600000, "d": "5/1", "win": "before"}, {"x": 1777680000000, "d": "5/2", "win": "before"}, {"x": 1777766400000, "d": "5/3", "win": "before"}, {"x": 1777852800000, "d": "5/4", "win": "before"}, {"x": 1777939200000, "d": "5/5", "win": "before"}, {"x": 1778025600000, "d": "5/6", "win": "before"}, {"x": 1778112000000, "d": "5/7", "win": "before"}, {"x": 1778198400000, "d": "5/8", "win": "before"}, {"x": 1778284800000, "d": "5/9", "win": "before"}, {"x": 1778371200000, "d": "5/10", "win": "before"}, {"x": 1778457600000, "d": "5/11", "win": "before"}, {"x": 1778544000000, "d": "5/12", "win": "before"}, {"x": 1778630400000, "d": "5/13", "win": "before"}, {"x": 1778716800000, "d": "5/14", "win": "before"}, {"x": 1778803200000, "d": "5/15", "win": "during"}, {"x": 1778889600000, "d": "5/16", "win": "during"}, {"x": 1778976000000, "d": "5/17", "win": "during"}, {"x": 1779062400000, "d": "5/18", "win": "during"}, {"x": 1779148800000, "d": "5/19", "win": "during"}, {"x": 1779235200000, "d": "5/20", "win": "during"}, {"x": 1779321600000, "d": "5/21", "win": "during"}, {"x": 1779408000000, "d": "5/22", "win": "during"}, {"x": 1779494400000, "d": "5/23", "win": "during"}, {"x": 1779580800000, "d": "5/24", "win": "during"}, {"x": 1779667200000, "d": "5/25", "win": "during"}, {"x": 1779753600000, "d": "5/26", "win": "during"}, {"x": 1779840000000, "d": "5/27", "win": "during"}, {"x": 1779926400000, "d": "5/28", "win": "during"}, {"x": 1780012800000, "d": "5/29", "win": "during"}, {"x": 1780099200000, "d": "5/30", "win": "during"}, {"x": 1780185600000, "d": "5/31", "win": "during"}, {"x": 1780272000000, "d": "6/1", "win": "during"}, {"x": 1780358400000, "d": "6/2", "win": "during"}, {"x": 1780444800000, "d": "6/3", "win": "during"}, {"x": 1780531200000, "d": "6/4", "win": "during"}, {"x": 1780617600000, "d": "6/5", "win": "during"}, {"x": 1780704000000, "d": "6/6", "win": "during"}, {"x": 1780790400000, "d": "6/7", "win": "during"}, {"x": 1780876800000, "d": "6/8", "win": "during"}, {"x": 1780963200000, "d": "6/9", "win": "during"}, {"x": 1781049600000, "d": "6/10", "win": "during"}, {"x": 1781136000000, "d": "6/11", "win": "during"}, {"x": 1781222400000, "d": "6/12", "win": "during"}, {"x": 1781308800000, "d": "6/13", "win": "during"}, {"x": 1781395200000, "d": "6/14", "win": "during"}, {"x": 1781481600000, "d": "6/15", "win": "during"}, {"x": 1781568000000, "d": "6/16", "win": "during"}, {"x": 1781654400000, "d": "6/17", "win": "during"}, {"x": 1781740800000, "d": "6/18", "win": "during"}, {"x": 1781827200000, "d": "6/19", "win": "after"}, {"x": 1781913600000, "d": "6/20", "win": "after"}, {"x": 1782000000000, "d": "6/21", "win": "after"}, {"x": 1782086400000, "d": "6/22", "win": "after"}, {"x": 1782172800000, "d": "6/23", "win": "after"}, {"x": 1782259200000, "d": "6/24", "win": "after"}, {"x": 1782345600000, "d": "6/25", "win": "after"}, {"x": 1782432000000, "d": "6/26", "win": "after"}, {"x": 1782518400000, "d": "6/27", "win": "after"}, {"x": 1782604800000, "d": "6/28", "win": "after"}, {"x": 1782691200000, "d": "6/29", "win": "after"}, {"x": 1782777600000, "d": "6/30", "win": "after"}, {"x": 1782864000000, "d": "7/1", "win": "after"}, {"x": 1782950400000, "d": "7/2", "win": "after"}, {"x": 1783036800000, "d": "7/3", "win": "after"}, {"x": 1783123200000, "d": "7/4", "win": "after"}, {"x": 1783209600000, "d": "7/5", "win": "after"}, {"x": 1783296000000, "d": "7/6", "win": "after"}, {"x": 1783382400000, "d": "7/7", "win": "after"}, {"x": 1783468800000, "d": "7/8", "win": "after"}, {"x": 1783555200000, "d": "7/9", "win": "after"}, {"x": 1783641600000, "d": "7/10", "win": "after"}, {"x": 1783728000000, "d": "7/11", "win": "after"}], "r": {"0": [530378, 513413, 503192, 490553, 469843, 419587, 364962, 354580, 385238, 390108, 397304, 372238, 388242, 384962, 378033, 384708, 388097, 402091, 380762, 375459, 374634, 407074, 416080, 442592, 464933, 531197, 575841, 616085, 640321, 651599, 660376, 676013, 710031, 738127, 761486, 783467, 816346, 866673, 873751, 880552, 886065, 888444, 929376, 952411, 987154, 1114815, 1137808, 1152509, 1180093, 1200236, 1253772, 1309368, 1390654, 1435823, 1474671, 1458296, 1502565, 1537450, 1634151, 1754306, 2020877, 2234480, 2363240, 2500660, 2831477, 3075756, 3220424, 3301588, 3318846, 3368208, 3403869, 3489642, 3500501, 3535104, 3597533, 3585505, 3640667, 3711137, 3753391, 3803730, 3826573, 3829888, 3855350, 3860737, 3866339, 3949183, 3985938, 4077513], "1": [331110, 321191, 314622, 307052, 293505, 260304, 221288, 212056, 233779, 236553, 240041, 223208, 234547, 233283, 229016, 234594, 238279, 250374, 244245, 242225, 242430, 267777, 275136, 294706, 311320, 358433, 387897, 416577, 432492, 439396, 445540, 456108, 476160, 491693, 506716, 519295, 536957, 567673, 570569, 574804, 576710, 571727, 591615, 605121, 626992, 702203, 714716, 724738, 741483, 752445, 784808, 816033, 862510, 885614, 901584, 884950, 907730, 915672, 968048, 1020899, 1146189, 1211810, 1274822, 1334759, 1496018, 1611638, 1670224, 1697801, 1697895, 1711233, 1725726, 1765367, 1767517, 1774111, 1797255, 1784110, 1814911, 1849858, 1867455, 1896137, 1906977, 1909087, 1923534, 1923098, 1925953, 1985134, 2017924, 2083132], "2": [164817, 158936, 156089, 152288, 146059, 130443, 115920, 115149, 122804, 123770, 126379, 117670, 121794, 119911, 117321, 118069, 117605, 118924, 112041, 108892, 107918, 114570, 116013, 122393, 127744, 145499, 158721, 168559, 176130, 180148, 182568, 187101, 199993, 211429, 219125, 227817, 241537, 258767, 262663, 265562, 268480, 274625, 293828, 301873, 313134, 361690, 370458, 374532, 384099, 392008, 410006, 431321, 460934, 478574, 497518, 496825, 516660, 540646, 579447, 635216, 759379, 888971, 941966, 1005512, 1157270, 1265934, 1331765, 1371191, 1382615, 1412115, 1429523, 1469236, 1475948, 1498082, 1528342, 1524140, 1542912, 1573077, 1593529, 1611671, 1622054, 1622885, 1635040, 1641901, 1644119, 1661094, 1661921, 1680237], "3": [26731, 25554, 24730, 23447, 22503, 21051, 19952, 19556, 20816, 21930, 23008, 23462, 23994, 23846, 23766, 24099, 24238, 24781, 16451, 16302, 16233, 16610, 16794, 17312, 17649, 18959, 20868, 22544, 23242, 23567, 23753, 24260, 25278, 26355, 26949, 27587, 29024, 31359, 31599, 31228, 31866, 33024, 34661, 36052, 37594, 41289, 42894, 43438, 44641, 45824, 48856, 51760, 56734, 60991, 64772, 65595, 67096, 69866, 75131, 86227, 102698, 120442, 132785, 146291, 163439, 182889, 202651, 216418, 221936, 228219, 231735, 237832, 239640, 245189, 253883, 258978, 264415, 269611, 273623, 277002, 278476, 278696, 277423, 276231, 276632, 283200, 286192, 293994], "4": [7144, 7153, 7170, 7183, 7192, 7202, 7213, 7229, 7249, 7264, 7283, 7305, 7311, 7324, 7331, 7347, 7373, 7407, 7418, 7431, 7443, 7505, 7524, 7565, 7602, 7681, 7726, 7772, 7821, 7849, 7873, 7899, 7948, 7993, 8033, 8095, 8150, 8185, 8222, 8255, 8299, 8350, 8542, 8622, 8684, 8873, 8973, 9025, 9086, 9167, 9306, 9444, 9653, 9809, 9941, 10064, 10198, 10367, 10606, 11004, 11620, 12213, 12592, 12972, 13565, 14077, 14525, 14893, 15101, 15326, 15553, 15855, 16031, 16346, 16662, 16876, 17012, 17164, 17345, 17474, 17613, 17757, 17884, 18022, 18135, 18234, 18370, 18596], "5": [576, 579, 581, 583, 584, 587, 589, 590, 590, 591, 593, 593, 596, 598, 599, 599, 602, 605, 607, 609, 610, 612, 613, 616, 618, 625, 629, 633, 636, 639, 642, 645, 652, 657, 663, 673, 678, 689, 698, 703, 710, 718, 730, 743, 750, 760, 767, 776, 784, 792, 796, 810, 823, 835, 856, 862, 881, 899, 919, 960, 991, 1044, 1075, 1126, 1185, 1218, 1259, 1285, 1299, 1315, 1332, 1352, 1365, 1376, 1391, 1401, 1417, 1427, 1439, 1446, 1453, 1463, 1469, 1485, 1500, 1521, 1531, 1554]}}, "2": {"dates": [{"x": 1776211200000, "d": "4/15", "win": "before"}, {"x": 1776297600000, "d": "4/16", "win": "before"}, {"x": 1776384000000, "d": "4/17", "win": "before"}, {"x": 1776470400000, "d": "4/18", "win": "before"}, {"x": 1776556800000, "d": "4/19", "win": "before"}, {"x": 1776643200000, "d": "4/20", "win": "before"}, {"x": 1776729600000, "d": "4/21", "win": "before"}, {"x": 1776816000000, "d": "4/22", "win": "before"}, {"x": 1776902400000, "d": "4/23", "win": "before"}, {"x": 1776988800000, "d": "4/24", "win": "before"}, {"x": 1777075200000, "d": "4/25", "win": "before"}, {"x": 1777161600000, "d": "4/26", "win": "before"}, {"x": 1777248000000, "d": "4/27", "win": "before"}, {"x": 1777334400000, "d": "4/28", "win": "before"}, {"x": 1777420800000, "d": "4/29", "win": "before"}, {"x": 1777507200000, "d": "4/30", "win": "before"}, {"x": 1777593600000, "d": "5/1", "win": "before"}, {"x": 1777680000000, "d": "5/2", "win": "before"}, {"x": 1777766400000, "d": "5/3", "win": "before"}, {"x": 1777852800000, "d": "5/4", "win": "before"}, {"x": 1777939200000, "d": "5/5", "win": "before"}, {"x": 1778025600000, "d": "5/6", "win": "before"}, {"x": 1778112000000, "d": "5/7", "win": "before"}, {"x": 1778198400000, "d": "5/8", "win": "before"}, {"x": 1778284800000, "d": "5/9", "win": "before"}, {"x": 1778371200000, "d": "5/10", "win": "before"}, {"x": 1778457600000, "d": "5/11", "win": "before"}, {"x": 1778544000000, "d": "5/12", "win": "before"}, {"x": 1778630400000, "d": "5/13", "win": "before"}, {"x": 1778716800000, "d": "5/14", "win": "before"}, {"x": 1778803200000, "d": "5/15", "win": "during"}, {"x": 1778889600000, "d": "5/16", "win": "during"}, {"x": 1778976000000, "d": "5/17", "win": "during"}, {"x": 1779062400000, "d": "5/18", "win": "during"}, {"x": 1779148800000, "d": "5/19", "win": "during"}, {"x": 1779235200000, "d": "5/20", "win": "during"}, {"x": 1779321600000, "d": "5/21", "win": "during"}, {"x": 1779408000000, "d": "5/22", "win": "during"}, {"x": 1779494400000, "d": "5/23", "win": "during"}, {"x": 1779580800000, "d": "5/24", "win": "during"}, {"x": 1779667200000, "d": "5/25", "win": "during"}, {"x": 1779753600000, "d": "5/26", "win": "during"}, {"x": 1779840000000, "d": "5/27", "win": "during"}, {"x": 1779926400000, "d": "5/28", "win": "during"}, {"x": 1780012800000, "d": "5/29", "win": "during"}, {"x": 1780099200000, "d": "5/30", "win": "during"}, {"x": 1780185600000, "d": "5/31", "win": "during"}, {"x": 1780272000000, "d": "6/1", "win": "during"}, {"x": 1780358400000, "d": "6/2", "win": "during"}, {"x": 1780444800000, "d": "6/3", "win": "during"}, {"x": 1780531200000, "d": "6/4", "win": "during"}, {"x": 1780617600000, "d": "6/5", "win": "during"}, {"x": 1780704000000, "d": "6/6", "win": "during"}, {"x": 1780790400000, "d": "6/7", "win": "during"}, {"x": 1780876800000, "d": "6/8", "win": "during"}, {"x": 1780963200000, "d": "6/9", "win": "during"}, {"x": 1781049600000, "d": "6/10", "win": "during"}, {"x": 1781136000000, "d": "6/11", "win": "during"}, {"x": 1781222400000, "d": "6/12", "win": "during"}, {"x": 1781308800000, "d": "6/13", "win": "during"}, {"x": 1781395200000, "d": "6/14", "win": "during"}, {"x": 1781481600000, "d": "6/15", "win": "during"}, {"x": 1781568000000, "d": "6/16", "win": "during"}, {"x": 1781654400000, "d": "6/17", "win": "during"}, {"x": 1781740800000, "d": "6/18", "win": "during"}, {"x": 1781827200000, "d": "6/19", "win": "after"}, {"x": 1781913600000, "d": "6/20", "win": "after"}, {"x": 1782000000000, "d": "6/21", "win": "after"}, {"x": 1782086400000, "d": "6/22", "win": "after"}, {"x": 1782172800000, "d": "6/23", "win": "after"}, {"x": 1782259200000, "d": "6/24", "win": "after"}, {"x": 1782345600000, "d": "6/25", "win": "after"}, {"x": 1782432000000, "d": "6/26", "win": "after"}, {"x": 1782518400000, "d": "6/27", "win": "after"}, {"x": 1782604800000, "d": "6/28", "win": "after"}, {"x": 1782691200000, "d": "6/29", "win": "after"}, {"x": 1782777600000, "d": "6/30", "win": "after"}, {"x": 1782864000000, "d": "7/1", "win": "after"}, {"x": 1782950400000, "d": "7/2", "win": "after"}, {"x": 1783036800000, "d": "7/3", "win": "after"}, {"x": 1783123200000, "d": "7/4", "win": "after"}, {"x": 1783209600000, "d": "7/5", "win": "after"}, {"x": 1783296000000, "d": "7/6", "win": "after"}, {"x": 1783382400000, "d": "7/7", "win": "after"}, {"x": 1783468800000, "d": "7/8", "win": "after"}, {"x": 1783555200000, "d": "7/9", "win": "after"}, {"x": 1783641600000, "d": "7/10", "win": "after"}, {"x": 1783728000000, "d": "7/11", "win": "after"}], "r": {"0": [406779, 424108, 448169, 469576, 480253, 486815, 482341, 515644, 527277, 564118, 601608, 632210, 661073, 703720, 713570, 767999, 789867, 816744, 849243, 850396, 877169, 885445, 908587, 930267, 954113, 999407, 1038735, 1026476, 1015777, 1009879, 1011480, 985560, 958230, 926203, 906454, 885272, 873314, 826569, 807000, 770123, 720320, 684822, 644533, 594993, 565121, 499135, 457942, 417113, 376595, 359682, 315966, 296042, 264260, 227643, 194234, 133508, 76426, 67270, 58237, 50237, 33397, 26687, 23842, 21712, 17721, 17721, 17721, 17721, 17721, 17721, 17721, 18103, 18797, 19537, 20190, 21609, 23552, 30685, 124225, 306699, 344493, 348398, 355057, 369271, 450769, 538843, 683691, 881934], "1": [261547, 273436, 291994, 310796, 319107, 325043, 322728, 347637, 356333, 381972, 407207, 427128, 448560, 479363, 487582, 528907, 545106, 565144, 587499, 589708, 610120, 616386, 634983, 646801, 663442, 694902, 723286, 714778, 704805, 697988, 698589, 681077, 661266, 636901, 623311, 609042, 601224, 567828, 554053, 528482, 495050, 471619, 442475, 406908, 385493, 336373, 307636, 278570, 250844, 238869, 206999, 193131, 168847, 147416, 125086, 82208, 39271, 33168, 27239, 22303, 10437, 5967, 4208, 2883, 0, 0, 0, 0, 0, 0, 0, 128, 502, 1023, 1500, 2560, 4095, 8256, 71360, 199493, 226606, 228134, 231490, 241525, 303514, 361667, 460469, 602919], "2": [107306, 110232, 113560, 114674, 115847, 115650, 113229, 118768, 120938, 129391, 139158, 148086, 153085, 161282, 161843, 169662, 173552, 178656, 186592, 184626, 187488, 188277, 191208, 199962, 206914, 219969, 228676, 226214, 226057, 226742, 227642, 221992, 216793, 211201, 206690, 201171, 197965, 188120, 183622, 175096, 161783, 151696, 143594, 133624, 127475, 116325, 106498, 97172, 86961, 83480, 76129, 71857, 66507, 53735, 43616, 27442, 15897, 13367, 10603, 8294, 4492, 2570, 1651, 1021, 0, 0, 0, 0, 0, 0, 0, 241, 551, 761, 932, 1273, 1583, 4013, 26015, 66917, 74999, 77209, 80265, 83751, 100002, 124759, 163816, 210543], "3": [20471, 22976, 25146, 26628, 27814, 28636, 28895, 31747, 32512, 35255, 37725, 39469, 41896, 45539, 46600, 51882, 53653, 55378, 57576, 58483, 61978, 63192, 64794, 65888, 66124, 66854, 69078, 67784, 67208, 67441, 67536, 64775, 62455, 60382, 58733, 57339, 56404, 52900, 51604, 48824, 45766, 43786, 40743, 36740, 34432, 28716, 26087, 23650, 21069, 19612, 15117, 13333, 11185, 8771, 7811, 6137, 3537, 3014, 2674, 1919, 747, 429, 262, 87, 0, 0, 0, 0, 0, 0, 0, 13, 23, 32, 37, 55, 153, 695, 9125, 22560, 25157, 25321, 25563, 26254, 29499, 34652, 41619, 50654], "4": [16812, 16821, 16826, 16835, 16842, 16843, 16844, 16847, 16848, 16854, 16871, 16879, 16884, 16888, 16895, 16897, 16905, 16915, 16923, 16926, 16930, 16936, 16944, 16955, 16971, 17013, 17025, 17029, 17033, 17034, 17039, 17041, 17040, 17043, 17044, 17044, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17045, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17044, 17048, 17052, 17053, 17056, 17061, 17063, 17076, 17086, 17108, 17137], "5": [643, 643, 643, 643, 643, 643, 645, 645, 646, 646, 647, 648, 648, 648, 650, 651, 651, 651, 653, 653, 653, 654, 658, 661, 662, 669, 670, 671, 674, 674, 674, 675, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 676, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 677, 678, 678, 678, 678, 678, 679, 679, 681]}}};
+  var C2={"1": {"pts": [{"x": 1776211200000, "y": 4534, "d": "4/15", "win": "before"}, {"x": 1776297600000, "y": 3701, "d": "4/16", "win": "before"}, {"x": 1776384000000, "y": 4987.38, "d": "4/17", "win": "before"}, {"x": 1776470400000, "y": 3983.14, "d": "4/18", "win": "before"}, {"x": 1776556800000, "y": 2902.9, "d": "4/19", "win": "before"}, {"x": 1776643200000, "y": 3877.9, "d": "4/20", "win": "before"}, {"x": 1776729600000, "y": 4301, "d": "4/21", "win": "before"}, {"x": 1776816000000, "y": 4644, "d": "4/22", "win": "before"}, {"x": 1776902400000, "y": 5160, "d": "4/23", "win": "before"}, {"x": 1776988800000, "y": 4190.36, "d": "4/24", "win": "before"}, {"x": 1777075200000, "y": 5607.8, "d": "4/25", "win": "before"}, {"x": 1777161600000, "y": 6216.38, "d": "4/26", "win": "before"}, {"x": 1777248000000, "y": 2997.9, "d": "4/27", "win": "before"}, {"x": 1777334400000, "y": 4024, "d": "4/28", "win": "before"}, {"x": 1777420800000, "y": 2470, "d": "4/29", "win": "before"}, {"x": 1777507200000, "y": 4386, "d": "4/30", "win": "before"}, {"x": 1777593600000, "y": 8514, "d": "5/1", "win": "before"}, {"x": 1777680000000, "y": 10986.9, "d": "5/2", "win": "before"}, {"x": 1777766400000, "y": 3867, "d": "5/3", "win": "before"}, {"x": 1777852800000, "y": 4386, "d": "5/4", "win": "before"}, {"x": 1777939200000, "y": 3612, "d": "5/5", "win": "before"}, {"x": 1778025600000, "y": 17594, "d": "5/6", "win": "before"}, {"x": 1778112000000, "y": 5637, "d": "5/7", "win": "before"}, {"x": 1778198400000, "y": 12751, "d": "5/8", "win": "before"}, {"x": 1778284800000, "y": 11745.9, "d": "5/9", "win": "before"}, {"x": 1778371200000, "y": 24372.8, "d": "5/10", "win": "before"}, {"x": 1778457600000, "y": 15304, "d": "5/11", "win": "before"}, {"x": 1778544000000, "y": 14940, "d": "5/12", "win": "before"}, {"x": 1778630400000, "y": 14051.9, "d": "5/13", "win": "before"}, {"x": 1778716800000, "y": 8592.9, "d": "5/14", "win": "before"}, {"x": 1779235200000, "y": 21101.9, "d": "5/20", "win": "during"}, {"x": 1779321600000, "y": 16040.5, "d": "5/21", "win": "during"}, {"x": 1779408000000, "y": 13959.7, "d": "5/22", "win": "during"}, {"x": 1779494400000, "y": 14239, "d": "5/23", "win": "during"}, {"x": 1779580800000, "y": 11760, "d": "5/24", "win": "during"}, {"x": 1779667200000, "y": 14215, "d": "5/25", "win": "during"}, {"x": 1779753600000, "y": 16513.7, "d": "5/26", "win": "during"}, {"x": 1779840000000, "y": 52917.72, "d": "5/27", "win": "during"}, {"x": 1779926400000, "y": 27237, "d": "5/28", "win": "during"}, {"x": 1780012800000, "y": 19440.99, "d": "5/29", "win": "during"}, {"x": 1780099200000, "y": 51554.31, "d": "5/30", "win": "during"}, {"x": 1780185600000, "y": 28647, "d": "5/31", "win": "during"}, {"x": 1780272000000, "y": 18453, "d": "6/1", "win": "during"}, {"x": 1780358400000, "y": 19062.8, "d": "6/2", "win": "during"}, {"x": 1780444800000, "y": 24391.8, "d": "6/3", "win": "during"}, {"x": 1780531200000, "y": 36556.8, "d": "6/4", "win": "during"}, {"x": 1780617600000, "y": 39781.48, "d": "6/5", "win": "during"}, {"x": 1780704000000, "y": 56396.77, "d": "6/6", "win": "during"}, {"x": 1780790400000, "y": 46385.9, "d": "6/7", "win": "during"}, {"x": 1780876800000, "y": 70110.5, "d": "6/8", "win": "during"}, {"x": 1780963200000, "y": 33007.05, "d": "6/9", "win": "during"}, {"x": 1781049600000, "y": 44920.72, "d": "6/10", "win": "during"}, {"x": 1781136000000, "y": 53083.74, "d": "6/11", "win": "during"}, {"x": 1781222400000, "y": 75243.9, "d": "6/12", "win": "during"}, {"x": 1781308800000, "y": 126443.8, "d": "6/13", "win": "during"}, {"x": 1781395200000, "y": 182882.4, "d": "6/14", "win": "during"}, {"x": 1781481600000, "y": 184424.8, "d": "6/15", "win": "during"}, {"x": 1781568000000, "y": 114499.2, "d": "6/16", "win": "during"}, {"x": 1781654400000, "y": 128698.6, "d": "6/17", "win": "during"}, {"x": 1781740800000, "y": 187248.7, "d": "6/18", "win": "during"}, {"x": 1781827200000, "y": 152328.3, "d": "6/19", "win": "after"}, {"x": 1781913600000, "y": 139024.5, "d": "6/20", "win": "after"}, {"x": 1782000000000, "y": 109640.6, "d": "6/21", "win": "after"}, {"x": 1782086400000, "y": 61480.8, "d": "6/22", "win": "after"}, {"x": 1782172800000, "y": 66303, "d": "6/23", "win": "after"}, {"x": 1782259200000, "y": 69213.7, "d": "6/24", "win": "after"}, {"x": 1782345600000, "y": 89627.9, "d": "6/25", "win": "after"}, {"x": 1782432000000, "y": 52356.6, "d": "6/26", "win": "after"}, {"x": 1782518400000, "y": 87804, "d": "6/27", "win": "after"}, {"x": 1782604800000, "y": 89845.6, "d": "6/28", "win": "after"}, {"x": 1782691200000, "y": 61230.7, "d": "6/29", "win": "after"}, {"x": 1782777600000, "y": 42953.8, "d": "6/30", "win": "after"}, {"x": 1782864000000, "y": 46218.7, "d": "7/1", "win": "after"}, {"x": 1782950400000, "y": 53150.8, "d": "7/2", "win": "after"}, {"x": 1783036800000, "y": 37643.8, "d": "7/3", "win": "after"}, {"x": 1783123200000, "y": 39466, "d": "7/4", "win": "after"}, {"x": 1783209600000, "y": 42317.7, "d": "7/5", "win": "after"}, {"x": 1783296000000, "y": 35809.9, "d": "7/6", "win": "after"}, {"x": 1783382400000, "y": 43819, "d": "7/7", "win": "after"}, {"x": 1783468800000, "y": 34643.6, "d": "7/8", "win": "after"}, {"x": 1783555200000, "y": 33969.6, "d": "7/9", "win": "after"}, {"x": 1783641600000, "y": 39457.8, "d": "7/10", "win": "after"}, {"x": 1783728000000, "y": 69020.6, "d": "7/11", "win": "after"}]}, "2": {"pts": [{"x": 1776211200000, "y": 959.9, "d": "4/15", "win": "before"}, {"x": 1776297600000, "y": 1891.8, "d": "4/16", "win": "before"}, {"x": 1776384000000, "y": 1340, "d": "4/17", "win": "before"}, {"x": 1776470400000, "y": 1901.8, "d": "4/18", "win": "before"}, {"x": 1776556800000, "y": 1615.9, "d": "4/19", "win": "before"}, {"x": 1776643200000, "y": 656, "d": "4/20", "win": "before"}, {"x": 1776729600000, "y": 1079.9, "d": "4/21", "win": "before"}, {"x": 1776816000000, "y": 804, "d": "4/22", "win": "before"}, {"x": 1776902400000, "y": 804, "d": "4/23", "win": "before"}, {"x": 1776988800000, "y": 1876, "d": "4/24", "win": "before"}, {"x": 1777075200000, "y": 4831.9, "d": "4/25", "win": "before"}, {"x": 1777161600000, "y": 2680, "d": "4/26", "win": "before"}, {"x": 1777248000000, "y": 1079.9, "d": "4/27", "win": "before"}, {"x": 1777334400000, "y": 1072, "d": "4/28", "win": "before"}, {"x": 1777420800000, "y": 3188, "d": "4/29", "win": "before"}, {"x": 1777507200000, "y": 1460, "d": "4/30", "win": "before"}, {"x": 1777593600000, "y": 2474, "d": "5/1", "win": "before"}, {"x": 1777680000000, "y": 3160, "d": "5/2", "win": "before"}, {"x": 1777766400000, "y": 3634.4, "d": "5/3", "win": "before"}, {"x": 1777852800000, "y": 894, "d": "5/4", "win": "before"}, {"x": 1777939200000, "y": 1192, "d": "5/5", "win": "before"}, {"x": 1778025600000, "y": 2234, "d": "5/6", "win": "before"}, {"x": 1778112000000, "y": 5067.9, "d": "5/7", "win": "before"}, {"x": 1778198400000, "y": 5541, "d": "5/8", "win": "before"}, {"x": 1778284800000, "y": 5364, "d": "5/9", "win": "before"}, {"x": 1778371200000, "y": 17083, "d": "5/10", "win": "before"}, {"x": 1778457600000, "y": 4209.9, "d": "5/11", "win": "before"}, {"x": 1778544000000, "y": 1788, "d": "5/12", "win": "before"}, {"x": 1778630400000, "y": 2980, "d": "5/13", "win": "before"}, {"x": 1778716800000, "y": 298, "d": "5/14", "win": "before"}, {"x": 1779235200000, "y": 0, "d": "5/20", "win": "during"}, {"x": 1779321600000, "y": 278, "d": "5/21", "win": "during"}, {"x": 1779408000000, "y": 0, "d": "5/22", "win": "during"}, {"x": 1779494400000, "y": 0, "d": "5/23", "win": "during"}, {"x": 1779580800000, "y": 0, "d": "5/24", "win": "during"}, {"x": 1779667200000, "y": 0, "d": "5/25", "win": "during"}, {"x": 1779753600000, "y": 0, "d": "5/26", "win": "during"}, {"x": 1779840000000, "y": 0, "d": "5/27", "win": "during"}, {"x": 1779926400000, "y": 0, "d": "5/28", "win": "during"}, {"x": 1780012800000, "y": 0, "d": "5/29", "win": "during"}, {"x": 1780099200000, "y": 0, "d": "5/30", "win": "during"}, {"x": 1780185600000, "y": 0, "d": "5/31", "win": "during"}, {"x": 1780272000000, "y": 0, "d": "6/1", "win": "during"}, {"x": 1780358400000, "y": 0, "d": "6/2", "win": "during"}, {"x": 1780444800000, "y": 29.9, "d": "6/3", "win": "during"}, {"x": 1780531200000, "y": 0, "d": "6/4", "win": "during"}, {"x": 1780617600000, "y": 0, "d": "6/5", "win": "during"}, {"x": 1780704000000, "y": 0, "d": "6/6", "win": "during"}, {"x": 1780790400000, "y": 0, "d": "6/7", "win": "during"}, {"x": 1780876800000, "y": 0, "d": "6/8", "win": "during"}, {"x": 1780963200000, "y": 0, "d": "6/9", "win": "during"}, {"x": 1781049600000, "y": 0, "d": "6/10", "win": "during"}, {"x": 1781136000000, "y": 0, "d": "6/11", "win": "during"}, {"x": 1781222400000, "y": 0, "d": "6/12", "win": "during"}, {"x": 1781308800000, "y": 0, "d": "6/13", "win": "during"}, {"x": 1781395200000, "y": 0, "d": "6/14", "win": "during"}, {"x": 1781481600000, "y": 0, "d": "6/15", "win": "during"}, {"x": 1781568000000, "y": 0, "d": "6/16", "win": "during"}, {"x": 1781654400000, "y": 0, "d": "6/17", "win": "during"}, {"x": 1781740800000, "y": 0, "d": "6/18", "win": "during"}, {"x": 1781827200000, "y": 0, "d": "6/19", "win": "after"}, {"x": 1781913600000, "y": 0, "d": "6/20", "win": "after"}, {"x": 1782000000000, "y": 0, "d": "6/21", "win": "after"}, {"x": 1782086400000, "y": 0, "d": "6/22", "win": "after"}, {"x": 1782172800000, "y": 0, "d": "6/23", "win": "after"}, {"x": 1782259200000, "y": 0, "d": "6/24", "win": "after"}, {"x": 1782345600000, "y": 0, "d": "6/25", "win": "after"}, {"x": 1782432000000, "y": 0, "d": "6/26", "win": "after"}, {"x": 1782518400000, "y": 0, "d": "6/27", "win": "after"}, {"x": 1782604800000, "y": 0, "d": "6/28", "win": "after"}, {"x": 1782691200000, "y": 0, "d": "6/29", "win": "after"}, {"x": 1782777600000, "y": 0, "d": "6/30", "win": "after"}, {"x": 1782864000000, "y": 0, "d": "7/1", "win": "after"}, {"x": 1782950400000, "y": 1192, "d": "7/2", "win": "after"}, {"x": 1783036800000, "y": 913.8, "d": "7/3", "win": "after"}, {"x": 1783123200000, "y": 854, "d": "7/4", "win": "after"}, {"x": 1783209600000, "y": 894, "d": "7/5", "win": "after"}, {"x": 1783296000000, "y": 1788, "d": "7/6", "win": "after"}, {"x": 1783382400000, "y": 596, "d": "7/7", "win": "after"}, {"x": 1783468800000, "y": 3884, "d": "7/8", "win": "after"}, {"x": 1783555200000, "y": 4147, "d": "7/9", "win": "after"}, {"x": 1783641600000, "y": 6616, "d": "7/10", "win": "after"}, {"x": 1783728000000, "y": 9665.9, "d": "7/11", "win": "after"}]}};
+  Object.keys(C2).forEach(function(k){drawP2('p2trend'+k,C2[k]);});
+  var p1Charts={};
+  Object.keys(C1).forEach(function(k){p1Charts[k]=drawP1('p1trend'+k,C1[k]);});
+
+  document.querySelectorAll('.r-switch').forEach(function(sw){
+    sw.querySelectorAll('.r-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        sw.querySelectorAll('.r-btn').forEach(function(b){b.classList.remove('active');});
+        this.classList.add('active');
+        var wrap=sw.parentElement;
+        var canvasId=null;
+        var cb=wrap.querySelector('.chart-body');
+        if(cb){var cv=cb.querySelector('canvas');if(cv)canvasId=cv.id;}
+        if(!canvasId)return;
+        var targetR=this.getAttribute('data-r');
+        var ch=p1Charts[canvasId.replace('p1trend','')];
+        if(!ch)return;
+        ch.data.datasets.forEach(function(ds,i){var rk=['total','R1','R2','R3','R4','R5'][i]||'total';ds.hidden=(rk!==targetR);});
+        ch.update();
+        var titleEl=wrap.querySelector('.chart-title')||wrap.parentElement.querySelector('.chart-title');
+        if(titleEl)titleEl.textContent=(RLBL[targetR]||this.textContent.trim())+' — 日趋势（绝对值）';
+      });
+    });
+  });
+
+  // ── P3 触点三窗切换 ──
+  var P3WCOL={before:'#6366f1',during:'#ef4444',after:'#10b981'};
+  document.querySelectorAll('.p3tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      var uid=this.getAttribute('data-uid'), w=this.getAttribute('data-w');
+      document.querySelectorAll('.p3tab[data-uid="'+uid+'"]').forEach(function(t){
+        var tw=t.getAttribute('data-w');
+        var on=(tw===w);
+        t.style.background=on?P3WCOL[tw]:'#fff';
+        t.style.color=on?'#fff':'#475569';
+      });
+      document.querySelectorAll('.p3panel[data-uid="'+uid+'"]').forEach(function(p){
+        p.style.display=(p.getAttribute('data-w')===w)?'block':'none';
+      });
+    });
+  });
+
+  // ── P2 顶部窗口卡片与图表绘图区对齐：渲染后把 .win-cards 的左右 padding 同步到 canvas 的 chartArea ──
+  function syncWinCards(){
+    document.querySelectorAll('.win-cards').forEach(function(cards){
+      // 找同一 store-section 内的 p2trend canvas
+      var sec=cards.closest('.store-section')||cards.parentElement;
+      var cv=sec?sec.querySelector('canvas[id^="p2trend"]'):null;
+      if(!cv)return;
+      var ch=window.Chart&&window.Chart.getChart?window.Chart.getChart(cv):null;
+      if(!ch||!ch.chartArea)return;
+      var cr=cv.getBoundingClientRect(); var scale=cr.width/cv.width;
+      var cardsRect=cards.getBoundingClientRect();
+      var plotLeftAbs=cr.left+ch.chartArea.left*scale;
+      var plotRightAbs=cr.left+ch.chartArea.right*scale;
+      var padL=Math.max(0, plotLeftAbs-cardsRect.left);
+      var padR=Math.max(0, cardsRect.right-plotRightAbs);
+      cards.style.paddingLeft=padL.toFixed(1)+'px';
+      cards.style.paddingRight=padR.toFixed(1)+'px';
+    });
+  }
+  // 首帧 + resize 时对齐（Chart.js 动画 600ms，延迟到动画后测量绘图区）
+  setTimeout(syncWinCards, 50);
+  setTimeout(syncWinCards, 750);
+  window.addEventListener('resize', function(){setTimeout(syncWinCards,300);});
+})();
+</script>
+</body>
+</html>
